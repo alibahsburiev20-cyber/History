@@ -1,41 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading Screen</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-image: url('https://github.com/alibahsburiev20-cyber/History/blob/main/1774424921197.png');
-            background-size: cover;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
-        .button {
-            background-color: #007bff;
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>История СССР: Битва Эпох</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Loading, please wait...</h1>
-    <button class="button">Start / Начать</button>
-    <button class="button">Settings / Настройки</button>
-    <button class="button">Exit / Выход</button>
+
+    <div id="screen-intro" class="screen">
+        <div class="letter-bg">
+            <button id="start-btn">НАЧАТЬ ТРАНСФОРМАЦИЮ</button>
+        </div>
+    </div>
+
+    <div id="screen-video" class="screen hidden">
+        <video id="intro-video" playsinline>
+            <source src="letter_flip.mp4" type="video/mp4"> 
+            </video>
+    </div>
+
+    <div id="screen-loading" class="screen hidden">
+        <div class="loader-content">
+            <h2 id="fact-text">Знаете ли вы, что...</h2>
+            <div class="progress-bar"><div id="load-fill"></div></div>
+            <p>Загрузка архивов...</p>
+        </div>
+    </div>
+
+    <div id="screen-game" class="screen hidden">
+        <header>
+            <div id="year-tag">1922</div>
+            <div id="resources">Сила: <span id="power">10</span> | Очки: <span id="score">0</span></div>
+        </header>
+        
+        <div id="battle-zone">
+            <div id="enemy-card">
+                <h3 id="enemy-name">Беспризорность</h3>
+                <div class="hp-bar"><div id="enemy-hp"></div></div>
+            </div>
+            <div id="hero-action">
+                <button onclick="attack()">УДАРИТЬ РЕФОРМОЙ</button>
+            </div>
+        </div>
+
+        <div id="upgrades">
+            <button onclick="upgrade(5)">Улучшить промышленность (+5 к силе)</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
