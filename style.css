@@ -17,7 +17,7 @@ body, html {
 /* Экран письма */
 .letter-bg {
     width: 100%; height: 100%;
-    background: url('letter.jpg') no-repeat center center; /* Твоя фотка письма */
+    background: url('https://github.com/alibahsburiev20-cyber/History/blob/main/1774424921197.png') no-repeat center center; /* Твоя фотка письма */
     background-size: cover;
     display: flex; justify-content: center; align-items: flex-end;
     padding-bottom: 50px;
