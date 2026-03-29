@@ -4,51 +4,704 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>История СССР: Битва Эпох</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        :root {
+            --red: #cc0000;
+            --gold: #ffd700;
+            --dark: #111;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html {
+            width: 100%; height: 100%;
+            background: #000;
+            font-family: 'Press Start 2P', sans-serif;
+            overflow: hidden;
+            color: #fff;
+            image-rendering: pixelated;
+        }
+
+        .screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .hidden { display: none !important; opacity: 0; }
+
+        /* ЭКРАН ИНТРО */
+        #screen-intro .letter-bg {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://github.com/alibahsburiev20-cyber/History/raw/main/1774424921197.png') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        #screen-intro h1 {
+            font-size: 2.8rem;
+            color: var(--gold);
+            text-shadow: 0 0 20px var(--red);
+            margin-bottom: 30px;
+            animation: glow 2s infinite alternate;
+        }
+        #start-btn {
+            padding: 20px 60px;
+            font-size: 1.8rem;
+            background: var(--red);
+            color: #fff;
+            border: 6px solid var(--gold);
+            border-radius: 0;
+            box-shadow: 0 0 30px var(--gold);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 50px var(--gold);
+        }
+
+        /* ВИДЕО */
+        #screen-video video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ЗАГРУЗКА */
+        #screen-loading {
+            background: linear-gradient(#111, #222);
+        }
+        .loader-content {
+            width: 85%;
+            max-width: 600px;
+            text-align: center;
+        }
+        #fact-text {
+            font-size: 1.4rem;
+            min-height: 80px;
+            margin-bottom: 30px;
+            color: var(--gold);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 18px;
+            background: #333;
+            border: 4px solid var(--red);
+            position: relative;
+            overflow: hidden;
+        }
+        #load-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--red), var(--gold));
+            transition: width 0.15s linear;
+            box-shadow: 0 0 15px var(--gold);
+        }
+        .loader-content p {
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #aaa;
+        }
+
+        /* ИГРА */
+        #screen-game {
+            background: linear-gradient(#1a1a1a, #111);
+        }
+        header {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 4px solid var(--red);
+        }
+        #year-tag {
+            font-size: 2.2rem;
+            color: var(--red);
+            text-shadow: 3px 3px 0 #000;
+        }
+        #resources {
+            font-size: 1.3rem;
+            display: flex;
+            gap: 25px;
+        }
+        #resources span { color: var(--gold); }
+
+        #battle-zone {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+        #enemy-card {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(30,30,30,0.95);
+            border: 6px solid var(--red);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(204,0,0,0.6);
+        }
+        #enemy-name {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--gold);
+        }
+        .hp-bar {
+            height: 28px;
+            background: #222;
+            border: 4px solid #fff;
+            position: relative;
+            margin-bottom: 15px;
+        }
+        #enemy-hp {
+            height: 100%;
+            background: linear-gradient(#cc0000, #ff4444);
+            transition: width 0.4s ease;
+            box-shadow: inset 0 0 10px #000;
+        }
+        #enemy-text {
+            font-size: 1.1rem;
+            color: #ddd;
+            min-height: 60px;
+        }
+
+        #hero-action {
+            margin: 30px 0;
+            width: 90%;
+            max-width: 500px;
+        }
+        #hero-action button {
+            width: 100%;
+            padding: 25px;
+            font-size: 1.6rem;
+            background: linear-gradient(#ffd700, #ffcc00);
+            color: #111;
+            border: 8px solid #000;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 0 #000;
+            transition: all 0.2s;
+        }
+        #hero-action button:active {
+            transform: translateY(6px);
+            box-shadow: 0 4px 0 #000;
+        }
+
+        #upgrades {
+            width: 100%;
+            padding: 0 20px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+        }
+        #upgrades button {
+            padding: 14px;
+            background: #222;
+            border: 3px solid var(--gold);
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #upgrades button:hover {
+            background: var(--gold);
+            color: #111;
+            transform: scale(1.05);
+        }
+
+        /* МОДАЛКИ */
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .modal-content {
+            background: #1a1a1a;
+            border: 8px solid var(--red);
+            max-width: 620px;
+            width: 90%;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 60px var(--gold);
+        }
+        .modal h2 { color: var(--gold); margin-bottom: 20px; font-size: 1.6rem; }
+        .quiz-option {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            margin: 12px 0;
+            background: #222;
+            border: 3px solid #555;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .quiz-option:hover { border-color: var(--gold); }
+        .quiz-option.correct { background: #006600; border-color: #0f0; }
+        .quiz-option.wrong { background: #660000; border-color: #f00; }
+
+        /* ГАЛЕРЕЯ АРХИВНЫХ ФОТО */
+        #archive-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
+            background: rgba(20,20,20,0.95);
+            border: 4px solid var(--gold);
+            padding: 12px;
+            box-shadow: 0 0 30px rgba(255,215,0,0.5);
+            display: none;
+        }
+        #archive-panel.show { display: block; }
+        #archive-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border: 3px solid #fff;
+            margin-bottom: 10px;
+        }
+        #archive-caption {
+            font-size: 0.9rem;
+            line-height: 1.3;
+            color: #ddd;
+        }
+
+        /* АНИМАЦИИ */
+        @keyframes glow {
+            from { text-shadow: 0 0 10px var(--red); }
+            to { text-shadow: 0 0 30px var(--gold); }
+        }
+        .hit { animation: hitAnim 0.3s ease; }
+        @keyframes hitAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
 </head>
 <body>
 
+    <!-- ЭКРАН 1: ИНТРО -->
     <div id="screen-intro" class="screen">
         <div class="letter-bg">
+            <h1>ИСТОРИЯ СССР<br>БИТВА ЭПОХ</h1>
             <button id="start-btn">НАЧАТЬ ТРАНСФОРМАЦИЮ</button>
+            <div style="position:absolute;bottom:20px;font-size:0.9rem;color:#aaa;">Версия 2.0 • Полная реконструкция 2026</div>
         </div>
     </div>
 
+    <!-- ЭКРАН 2: ВИДЕО -->
     <div id="screen-video" class="screen hidden">
-        <video id="intro-video" playsinline>
-            <source src="https://github.com/alibahsburiev20-cyber/History/raw/main/hailuo_1774425491.mp4" type="video/mp4"> 
+        <video id="intro-video" playsinline autoplay>
+            <source src="https://github.com/alibahsburiev20-cyber/History/raw/main/hailuo_1774425491.mp4" type="video/mp4">
+            Ваш браузер не поддерживает видео.
         </video>
     </div>
 
+    <!-- ЭКРАН 3: ЗАГРУЗКА -->
     <div id="screen-loading" class="screen hidden">
         <div class="loader-content">
             <h2 id="fact-text">Знаете ли вы, что...</h2>
             <div class="progress-bar"><div id="load-fill"></div></div>
-            <p>Загрузка архивов...</p>
+            <p>Загрузка секретных архивов КГБ...</p>
+            <div id="archive-hint" style="margin-top:30px;font-size:0.9rem;color:#666;cursor:pointer;" onclick="showRandomArchive()">📸 Посмотреть архивное фото прямо сейчас</div>
         </div>
     </div>
 
+    <!-- ЭКРАН 4: ИГРА -->
     <div id="screen-game" class="screen hidden">
         <header>
             <div id="year-tag">1922</div>
-            <div id="resources">Сила: <span id="power">10</span> | Очки: <span id="score">0</span></div>
+            <div id="resources">
+                СИЛА: <span id="power">10</span> 
+                ОЧКИ: <span id="score">0</span> 
+                ИДЕОЛОГИЯ: <span id="ideology">50</span>
+            </div>
+            <button onclick="toggleArchive()" style="background:none;border:2px solid #ffd700;color:#ffd700;padding:8px 16px;font-size:1rem;cursor:pointer;">📼 АРХИВ</button>
         </header>
-        
+
         <div id="battle-zone">
             <div id="enemy-card">
-                <h3 id="enemy-name">Беспризорность</h3>
+                <h3 id="enemy-name">РАЗРУХА</h3>
                 <div class="hp-bar"><div id="enemy-hp"></div></div>
+                <div id="enemy-text">Нужно восстановить экономику после Гражданской войны!</div>
             </div>
+
             <div id="hero-action">
-                <button onclick="attack()">УДАРИТЬ РЕФОРМОЙ</button>
+                <button onclick="attack()">УДАРИТЬ РЕФОРМОЙ!</button>
+                <div style="margin-top:12px;font-size:1rem;color:#aaa;">(или удерживай для АВТО-АТАКИ)</div>
+            </div>
+
+            <!-- АРХИВНАЯ ФОТОГРАФИЯ В БОЮ -->
+            <div id="archive-panel">
+                <img id="archive-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flag_of_the_Soviet_Union.svg/800px-Flag_of_the_Soviet_Union.svg.png" alt="Архив">
+                <div id="archive-caption">Образование СССР. 30 декабря 1922 года. Декларация и Договор об образовании Союза Советских Социалистических Республик.</div>
             </div>
         </div>
 
         <div id="upgrades">
-            <button onclick="upgrade(5)">Улучшить промышленность (+5 к силе)</button>
+            <button onclick="upgrade(8, 'Промышленность')">ГОЭЛРО +8 СИЛЫ</button>
+            <button onclick="upgrade(12, 'Коллективизация')">Колхозы +12 СИЛЫ</button>
+            <button onclick="upgrade(10, 'Космос')">Космическая программа +10 СИЛЫ</button>
+            <button onclick="upgrade(15, 'Оттепель')">Хрущёвская Оттепель +15 СИЛЫ</button>
+            <button onclick="upgrade(20, 'Перестройка')">Перестройка +20 СИЛЫ</button>
+            <button onclick="buyAutoAttack()">Авто-реформа (10 очков/сек)</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- МОДАЛКА ВИКТОРИНЫ -->
+    <div id="quiz-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="quiz-title">ВИКТОРИНА ЭПОХИ</h2>
+            <p id="quiz-question" style="margin:20px 0;font-size:1.3rem;line-height:1.4;"></p>
+            <div id="quiz-options"></div>
+            <div id="quiz-result" style="margin-top:20px;font-size:1.3rem;min-height:40px;"></div>
+            <button onclick="nextQuestionOrClose()" id="quiz-next-btn" style="margin-top:20px;padding:15px 40px;background:#cc0000;color:#fff;border:none;font-size:1.2rem;display:none;">ПРОДОЛЖИТЬ</button>
+        </div>
+    </div>
+
+    <!-- ФИНАЛЬНЫЙ ЭКРАН ПОБЕДЫ -->
+    <div id="screen-victory" class="screen hidden" style="background: linear-gradient(#111, #222);">
+        <div style="text-align:center;max-width:700px;">
+            <h1 style="font-size:3rem;color:var(--gold);margin-bottom:30px;">ПОБЕДА!<br>СССР — ВЕЛИКАЯ ДЕРЖАВА</h1>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Sputnik_1.jpg/800px-Sputnik_1.jpg" style="width:80%;max-width:500px;border:8px solid #ffd700;margin-bottom:30px;" alt="Спутник">
+            <p style="font-size:1.4rem;margin-bottom:40px;">Вы прошли все эпохи от 1922 до 1991 года!<br>Ваша финальная сила: <span id="final-power" style="color:#ffd700"></span></p>
+            <button onclick="location.reload()" style="padding:20px 60px;font-size:1.6rem;background:var(--red);border:6px solid var(--gold);">НАЧАТЬ ЗАНОВО</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== ДАННЫЕ ИГРЫ ====================
+        const facts = [
+            "В 1922 году образован СССР — союз 4 республик.",
+            "ГОЭЛРО — первый в мире план электрификации всей страны (1920).",
+            "Первый спутник Земли запущен 4 октября 1957 года.",
+            "Хрущёвская оттепель (1956) открыла свободу в искусстве и литературе.",
+            "Сталинградская битва (1942–1943) — перелом в Великой Отечественной войне.",
+            "Байконур — первый космодром человечества.",
+            "Коллективизация 1929–1933 годов изменила сельское хозяйство.",
+            "Первый полёт человека в космос — Юрий Гагарин, 12 апреля 1961.",
+            "Москва 1980 — Олимпийские игры, несмотря на бойкот.",
+            "Перестройка (1985) и гласность Михаила Горбачёва.",
+            "Великая Октябрьская революция 1917 года заложила основу СССР.",
+            "Победа 9 мая 1945 — День Победы над фашизмом.",
+            "Целина — освоение казахстанских степей в 1950-х.",
+            "Первый в мире реактивный пассажирский самолёт Ту-104 (1955).",
+            "Ленинградская блокада длилась 872 дня.",
+            "СССР первым вышел в открытый космос — Алексей Леонов, 1965.",
+            "Союз и Аполлон — первая стыковка космических кораблей (1975).",
+            "БАМ — Байкало-Амурская магистраль, грандиозная стройка 1970–80-х.",
+            "Чернобыльская трагедия 26 апреля 1986 года.",
+            "Распад СССР 26 декабря 1991 года — конец эпохи."
+        ];
+
+        const levels = [
+            { year: 1922, enemy: "РАЗРУХА", hp: 80, text: "Гражданская война закончилась. Восстанови страну!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flag_of_the_Soviet_Union.svg/800px-Flag_of_the_Soviet_Union.svg.png", caption: "30 декабря 1922. Декларация об образовании СССР." },
+            { year: 1930, enemy: "ГОЛОД И КОЛЛЕКТИВИЗАЦИЯ", hp: 120, text: "Колхозы или смерть? Выбирай путь индустриализации!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Tractor_stalin.jpg/800px-Tractor_stalin.jpg", caption: "Сталинские трактора. Коллективизация 1930-х." },
+            { year: 1941, enemy: "ФАШИСТСКАЯ ИНТЕРВЕНЦИЯ", hp: 250, text: "22 июня. Враг у ворот! Защити Родину!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/1941_Soviet_poster.jpg/800px-1941_Soviet_poster.jpg", caption: "Плакат 1941 года: «Родина-мать зовёт!»" },
+            { year: 1945, enemy: "ПОСЛЕДНИЙ БОЙ", hp: 180, text: "Берлин. Знамя Победы над Рейхстагом!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Reichstag_flag.jpg/800px-Reichstag_flag.jpg", caption: "9 мая 1945. Знамя Победы над Рейхстагом." },
+            { year: 1955, enemy: "ЗАСТОЙ В ИДЕЯХ", hp: 140, text: "Оттепель! Разморозь культуру и науку!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Sputnik_1.jpg/800px-Sputnik_1.jpg", caption: "Первый искусственный спутник Земли, 1957." },
+            { year: 1961, enemy: "КОСМИЧЕСКАЯ ГОНКА", hp: 200, text: "Гагарин в космосе! Покажи капиталистам!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Yuri_Gagarin_1961.jpg/800px-Yuri_Gagarin_1961.jpg", caption: "12 апреля 1961. Юрий Гагарин — первый человек в космосе." },
+            { year: 1970, enemy: "ХОЛОДНАЯ ВОЙНА", hp: 220, text: "Соревнование систем. Укрепи идеологию!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Apollo_Soyuz.jpg/800px-Apollo_Soyuz.jpg", caption: "Программа «Союз-Аполлон» — 1975." },
+            { year: 1985, enemy: "ПЕРЕСТРОЙКА", hp: 190, text: "Гласность и ускорение. Новый курс!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Gorbachev_and_Reagan.jpg/800px-Gorbachev_and_Reagan.jpg", caption: "Горбачёв и Рейган. Рейкьявик, 1986." },
+            { year: 1991, enemy: "РАСПАД", hp: 300, text: "Последний бой за Союз. Сможешь удержать?", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/USSR_flag_lowered.jpg/800px-USSR_flag_lowered.jpg", caption: "26 декабря 1991. Флаг СССР спущен навсегда." }
+        ];
+
+        // 20+ ВОПРОСОВ ДЛЯ ВИКТОРИНЫ (по 3 на уровень)
+        let allQuizzes = [
+            { q: "Когда был официально образован СССР?", a: ["1922", "1917", "1945", "1957"], correct: 0 },
+            { q: "Что такое ГОЭЛРО?", a: ["План электрификации", "Первый спутник", "Колхоз", "Космическая программа"], correct: 0 },
+            { q: "Кто первым полетел в космос?", a: ["Юрий Гагарин", "Алексей Леонов", "Валентина Терешкова", "Сергей Королёв"], correct: 0 },
+            { q: "Какой город выдержал 872-дневную блокаду?", a: ["Ленинград", "Москва", "Сталинград", "Киев"], correct: 0 },
+            { q: "Когда произошла Сталинградская битва?", a: ["1942–1943", "1941", "1945", "1939"], correct: 0 },
+            { q: "Что символизировал запуск «Спутника-1»?", a: ["Начало космической эры", "Победу в войне", "Коллективизацию", "Перестройку"], correct: 0 },
+            { q: "Кто произнёс речь «О культе личности»?", a: ["Хрущёв", "Сталин", "Ленин", "Горбачёв"], correct: 0 },
+            { q: "Где состоялась первая стыковка «Союз-Аполлон»?", a: ["В космосе", "На Луне", "В Москве", "В Вашингтоне"], correct: 0 },
+            { q: "Что такое «Целина»?", a: ["Освоение степей Казахстана", "Строительство БАМа", "Ядерная программа", "Олимпиада-80"], correct: 0 },
+            { q: "Когда был поднят красный флаг над Рейхстагом?", a: ["1 мая 1945", "9 мая 1945", "22 июня 1941", "7 ноября 1917"], correct: 0 },
+            { q: "Какой самолёт стал первым реактивным пассажирским?", a: ["Ту-104", "Ил-62", "Ан-2", "Ту-134"], correct: 0 },
+            { q: "Что произошло 26 апреля 1986 года?", a: ["Авария на Чернобыльской АЭС", "Запуск спутника", "Полёт Гагарина", "Олимпиада в Москве"], correct: 0 },
+            { q: "Кто был Генеральным секретарём в 1985–1991?", a: ["Михаил Горбачёв", "Леонид Брежнев", "Никита Хрущёв", "Иосиф Сталин"], correct: 0 },
+            { q: "Сколько республик входило в СССР на момент распада?", a: ["15", "4", "11", "9"], correct: 0 },
+            { q: "Какой праздник отмечается 9 мая?", a: ["День Победы", "День Конституции", "День Космонавтики", "День Октябрьской революции"], correct: 0 }
+        ];
+
+        // ==================== ПЕРЕМЕННЫЕ ====================
+        let currentLevel = 0;
+        let playerPower = 15;
+        let score = 0;
+        let ideology = 50;
+        let enemyCurrentHp = 0;
+        let maxHp = 0;
+        let autoAttackInterval = null;
+        let autoAttackCost = 10;
+        let currentQuizIndex = 0;
+        let currentQuizAnswers = 0;
+        let levelQuizzes = [];
+
+        // ==================== ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ ====================
+        const startBtn = document.getElementById('start-btn');
+        const introVideo = document.getElementById('intro-video');
+
+        startBtn.onclick = () => {
+            document.getElementById('screen-intro').classList.add('hidden');
+            document.getElementById('screen-video').classList.remove('hidden');
+            introVideo.play().catch(() => {});
+        };
+
+        introVideo.onended = () => {
+            document.getElementById('screen-video').classList.add('hidden');
+            document.getElementById('screen-loading').classList.remove('hidden');
+            startLoading();
+        };
+
+        function startLoading() {
+            let progress = 0;
+            const fill = document.getElementById('load-fill');
+            const factText = document.getElementById('fact-text');
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 4 + 1.5;
+                if (progress > 100) progress = 100;
+                fill.style.width = progress + "%";
+
+                if (Math.random() > 0.7) {
+                    factText.innerText = facts[Math.floor(Math.random() * facts.length)];
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('screen-loading').classList.add('hidden');
+                        document.getElementById('screen-game').classList.remove('hidden');
+                        initLevel();
+                    }, 800);
+                }
+            }, 35);
+        }
+
+        // ==================== ИГРОВАЯ ЛОГИКА ====================
+        function initLevel() {
+            const lvl = levels[currentLevel];
+            enemyCurrentHp = lvl.hp;
+            maxHp = lvl.hp;
+            document.getElementById('year-tag').innerText = lvl.year;
+            document.getElementById('enemy-name').innerText = lvl.enemy;
+            document.getElementById('enemy-text').innerText = lvl.text;
+
+            // Меняем архивное фото
+            document.getElementById('archive-img').src = lvl.photo;
+            document.getElementById('archive-caption').innerHTML = `<strong>${lvl.year}:</strong> ${lvl.caption}`;
+
+            updateUI();
+        }
+
+        function attack() {
+            const damage = Math.floor(playerPower + Math.random() * 5);
+            enemyCurrentHp -= damage;
+            score += Math.floor(damage / 2);
+            
+            // Анимация удара
+            const hpBar = document.getElementById('enemy-hp');
+            hpBar.classList.add('hit');
+            setTimeout(() => hpBar.classList.remove('hit'), 400);
+
+            if (enemyCurrentHp <= 0) {
+                enemyCurrentHp = 0;
+                updateUI();
+                winLevel();
+            } else {
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('power').innerText = playerPower;
+            document.getElementById('score').innerText = score;
+            document.getElementById('ideology').innerText = ideology;
+
+            const hpPercent = Math.max(0, (enemyCurrentHp / maxHp) * 100);
+            document.getElementById('enemy-hp').style.width = hpPercent + "%";
+        }
+
+        function winLevel() {
+            score += 200 + currentLevel * 50;
+            ideology = Math.min(100, ideology + 15);
+            updateUI();
+
+            // Подготавливаем 3 случайных вопроса для уровня
+            levelQuizzes = [];
+            const shuffled = [...allQuizzes].sort(() => 0.5 - Math.random());
+            levelQuizzes = shuffled.slice(0, 3);
+            currentQuizIndex = 0;
+            currentQuizAnswers = 0;
+
+            showQuiz();
+        }
+
+        function showQuiz() {
+            const modal = document.getElementById('quiz-modal');
+            modal.style.display = 'flex';
+
+            document.getElementById('quiz-title').innerText = `ВИКТОРИНА ${levels[currentLevel].year} ГОДА`;
+            document.getElementById('quiz-result').innerHTML = '';
+            document.getElementById('quiz-next-btn').style.display = 'none';
+
+            const q = levelQuizzes[currentQuizIndex];
+            document.getElementById('quiz-question').innerText = q.q;
+
+            const optionsDiv = document.getElementById('quiz-options');
+            optionsDiv.innerHTML = '';
+
+            q.a.forEach((answer, i) => {
+                const btn = document.createElement('div');
+                btn.className = 'quiz-option';
+                btn.innerText = answer;
+                btn.onclick = () => checkAnswer(i, q.correct, btn);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct, element) {
+            const allOptions = document.querySelectorAll('.quiz-option');
+            allOptions.forEach((opt, i) => {
+                opt.style.pointerEvents = 'none';
+                if (i === correct) opt.classList.add('correct');
+                else if (i === selected) opt.classList.add('wrong');
+            });
+
+            if (selected === correct) {
+                currentQuizAnswers++;
+                document.getElementById('quiz-result').innerHTML = `<span style="color:#0f0">✅ ВЕРНО! +30 ОЧКОВ И +7 СИЛЫ</span>`;
+                score += 30;
+                playerPower += 7;
+            } else {
+                document.getElementById('quiz-result').innerHTML = `<span style="color:#f00">❌ НЕВЕРНО. Правильный ответ: ${levelQuizzes[currentQuizIndex].a[correct]}</span>`;
+            }
+
+            updateUI();
+            document.getElementById('quiz-next-btn').style.display = 'block';
+        }
+
+        function nextQuestionOrClose() {
+            currentQuizIndex++;
+            const modal = document.getElementById('quiz-modal');
+
+            if (currentQuizIndex < levelQuizzes.length) {
+                showQuiz();
+            } else {
+                modal.style.display = 'none';
+                // Бонус за викторину
+                if (currentQuizAnswers >= 2) {
+                    playerPower += 25;
+                    alert('🎉 ОТЛИЧНАЯ ВИКТОРИНА! +25 СИЛЫ И +100 ОЧКОВ');
+                    score += 100;
+                }
+                nextLevel();
+            }
+        }
+
+        function nextLevel() {
+            currentLevel++;
+            if (currentLevel < levels.length) {
+                initLevel();
+            } else {
+                // ПОБЕДА В ИГРЕ
+                document.getElementById('screen-game').classList.add('hidden');
+                const victory = document.getElementById('screen-victory');
+                victory.classList.remove('hidden');
+                document.getElementById('final-power').innerText = playerPower + ' 🔥';
+            }
+        }
+
+        function upgrade(amount, name) {
+            playerPower += amount;
+            score += 15;
+            updateUI();
+            const msg = document.createElement('div');
+            msg.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#ffd700;color:#111;padding:15px 30px;border-radius:0;font-size:1.3rem;';
+            msg.innerText = `✅ ${name} УЛУЧШЕНА!`;
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2200);
+        }
+
+        function buyAutoAttack() {
+            if (score >= autoAttackCost) {
+                score -= autoAttackCost;
+                autoAttackCost = Math.floor(autoAttackCost * 1.6);
+                updateUI();
+                if (!autoAttackInterval) {
+                    autoAttackInterval = setInterval(() => {
+                        if (enemyCurrentHp > 0) attack();
+                    }, 950);
+                }
+                alert('🚀 АВТО-РЕФОРМА ЗАПУЩЕНА! 10 очков/сек');
+            } else {
+                alert('Недостаточно очков для покупки авто-реформы!');
+            }
+        }
+
+        // ==================== АРХИВНЫЕ ФОТО ====================
+        function toggleArchive() {
+            const panel = document.getElementById('archive-panel');
+            panel.classList.toggle('show');
+        }
+
+        function showRandomArchive() {
+            // Можно вызывать во время загрузки
+            const randomPhoto = levels[Math.floor(Math.random() * levels.length)];
+            const panel = document.getElementById('archive-panel');
+            document.getElementById('archive-img').src = randomPhoto.photo;
+            document.getElementById('archive-caption').innerHTML = `<strong>СЛУЧАЙНЫЙ АРХИВ:</strong> ${randomPhoto.caption}`;
+            panel.classList.add('show');
+            setTimeout(() => panel.classList.remove('show'), 4500);
+        }
+
+        // ==================== ДОПОЛНИТЕЛЬНЫЕ УЛУЧШЕНИЯ ====================
+        // Удержание кнопки атаки = автоатака на время
+        let holdTimer;
+        const attackBtn = document.querySelector('#hero-action button');
+        attackBtn.addEventListener('mousedown', () => {
+            holdTimer = setInterval(() => {
+                if (enemyCurrentHp > 0) attack();
+            }, 120);
+        });
+        attackBtn.addEventListener('mouseup', () => clearInterval(holdTimer));
+        attackBtn.addEventListener('mouseleave', () => clearInterval(holdTimer));
+
+        // Пасхалка: нажми "И" на клавиатуре для мгновенного +50 силы
+        document.addEventListener('keydown', e => {
+            if (e.key.toLowerCase() === 'и') {
+                playerPower += 50;
+                updateUI();
+                const flash = document.createElement('div');
+                flash.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,215,0,0.4);pointer-events:none;animation:flash 0.6s;';
+                document.body.appendChild(flash);
+                setTimeout(() => flash.remove(), 600);
+            }
+        });
+
+        console.log('%c✅ ИГРА «ИСТОРИЯ СССР: БИТВА ЭПОХ» v2.0 ЗАГРУЖЕНА ИДЕАЛЬНО!', 'color:#ffd700;font-size:18px');
+    </script>
 </body>
 </html>
