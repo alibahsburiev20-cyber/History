@@ -3,902 +3,702 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>История СССР: Битва Эпох — Полная Реконструкция</title>
+    <title>История СССР: Битва Эпох</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-        :root {
-            --red: #cc0000;
-            --gold: #ffd700;
-            --dark: #111;
-        }
-
+        :root { --red: #cc0000; --gold: #ffd700; --dark: #111; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html {
-            width: 100%; height: 100%;
-            background: #000;
-            font-family: 'Press Start 2P', sans-serif;
-            overflow: hidden;
-            color: #fff;
-            image-rendering: pixelated;
-        }
+        body, html { width: 100%; height: 100%; background: #000; font-family: 'Press Start 2P', sans-serif; overflow: hidden; color: #fff; }
+        .screen { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .hidden { display: none !important; }
 
-        .screen {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        .hidden { display: none !important; opacity: 0; }
+        #screen-intro .letter-bg { width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://github.com/alibahsburiev20-cyber/History/raw/main/1774424921197.png') center/cover no-repeat; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        #screen-intro h1 { font-size: 2.8rem; color: var(--gold); text-shadow: 0 0 20px var(--red); margin-bottom: 30px; animation: glow 2s infinite alternate; }
+        #start-btn { padding: 20px 60px; font-size: 1.8rem; background: var(--red); color: #fff; border: 6px solid var(--gold); cursor: pointer; transition: all 0.3s; }
+        #start-btn:hover { transform: scale(1.1); box-shadow: 0 0 50px var(--gold); }
 
-        /* ЭКРАН ИНТРО */
-        #screen-intro .letter-bg {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://github.com/alibahsburiev20-cyber/History/raw/main/1774424921197.png') center/cover no-repeat;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-        }
-        #screen-intro h1 {
-            font-size: 2.8rem;
-            color: var(--gold);
-            text-shadow: 0 0 20px var(--red);
-            margin-bottom: 30px;
-            animation: glow 2s infinite alternate;
-        }
-        #start-btn {
-            padding: 20px 60px;
-            font-size: 1.8rem;
-            background: var(--red);
-            color: #fff;
-            border: 6px solid var(--gold);
-            border-radius: 0;
-            box-shadow: 0 0 30px var(--gold);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        #start-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 50px var(--gold);
-        }
+        #screen-video video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* ВИДЕО */
-        #screen-video video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        #screen-loading { background: linear-gradient(#111, #222); }
+        .loader-content { width: 85%; max-width: 600px; text-align: center; }
+        #fact-text { font-size: 1.4rem; min-height: 80px; margin-bottom: 30px; color: var(--gold); }
+        .progress-bar { width: 100%; height: 18px; background: #333; border: 4px solid var(--red); overflow: hidden; }
+        #load-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--red), var(--gold)); transition: width 0.15s linear; }
+        .loader-content p { margin-top: 20px; font-size: 1.1rem; color: #aaa; }
 
-        /* ЗАГРУЗКА */
-        #screen-loading {
-            background: linear-gradient(#111, #222);
-        }
-        .loader-content {
-            width: 85%;
-            max-width: 600px;
-            text-align: center;
-        }
-        #fact-text {
-            font-size: 1.4rem;
-            min-height: 80px;
-            margin-bottom: 30px;
-            color: var(--gold);
-        }
-        .progress-bar {
-            width: 100%;
-            height: 18px;
-            background: #333;
-            border: 4px solid var(--red);
-            position: relative;
-            overflow: hidden;
-        }
-        #load-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--red), var(--gold));
-            transition: width 0.15s linear;
-            box-shadow: 0 0 15px var(--gold);
-        }
-        .loader-content p {
-            margin-top: 20px;
-            font-size: 1.1rem;
-            color: #aaa;
-        }
-
-        /* ИГРА */
-        #screen-game {
-            background: linear-gradient(#1a1a1a, #111);
-        }
-        header {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(0,0,0,0.9);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 4px solid var(--red);
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        #year-tag {
-            font-size: 2.2rem;
-            color: var(--red);
-            text-shadow: 3px 3px 0 #000;
-        }
-        #resources {
-            font-size: 1.3rem;
-            display: flex;
-            gap: 25px;
-        }
+        #screen-game { background: linear-gradient(#1a1a1a, #111); }
+        header { width: 100%; padding: 15px 20px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--red); flex-wrap: wrap; gap: 10px; }
+        #year-tag { font-size: 2.2rem; color: var(--red); }
+        #resources { font-size: 1.3rem; display: flex; gap: 25px; }
         #resources span { color: var(--gold); }
 
-        /* ТАБЫ */
-        .tabs {
-            width: 100%;
-            background: rgba(30,30,30,0.95);
-            display: flex;
-            border-bottom: 4px solid var(--red);
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 18px;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .tab-btn.active {
-            background: var(--red);
-            color: #fff;
-            box-shadow: 0 0 20px var(--gold);
-        }
-        .tab-content {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-            overflow-y: auto;
-            padding: 20px;
-            max-height: calc(100vh - 220px);
-            scrollbar-width: thin;
-        }
+        .tabs { width: 100%; background: rgba(30,30,30,0.95); display: flex; border-bottom: 4px solid var(--red); }
+        .tab-btn { flex: 1; padding: 18px; background: transparent; border: none; color: #fff; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; }
+        .tab-btn.active { background: var(--red); box-shadow: 0 0 20px var(--gold); }
+        .tab-content { flex: 1; display: none; flex-direction: column; overflow-y: auto; padding: 20px; max-height: calc(100vh - 220px); scrollbar-width: thin; scrollbar-color: var(--red) #222; }
         .tab-content.active { display: flex; }
 
-        /* БИТВА */
-        #battle-zone {
-            flex: 1;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-        }
-        #enemy-card {
-            width: 90%;
-            max-width: 500px;
-            background: rgba(30,30,30,0.95);
-            border: 6px solid var(--red);
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 0 40px rgba(204,0,0,0.6);
-        }
-        #enemy-name {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            color: var(--gold);
-        }
-        .hp-bar {
-            height: 28px;
-            background: #222;
-            border: 4px solid #fff;
-            position: relative;
-            margin-bottom: 15px;
-        }
-        #enemy-hp {
-            height: 100%;
-            background: linear-gradient(#cc0000, #ff4444);
-            transition: width 0.4s ease;
-            box-shadow: inset 0 0 10px #000;
-        }
-        #enemy-text {
-            font-size: 1.1rem;
-            color: #ddd;
-            min-height: 60px;
-        }
+        #battle-zone { flex: 1; width: 100%; display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative; }
+        #enemy-card { width: 90%; max-width: 500px; background: rgba(30,30,30,0.95); border: 6px solid var(--red); padding: 20px; text-align: center; box-shadow: 0 0 40px rgba(204,0,0,0.6); }
+        #enemy-name { font-size: 1.8rem; margin-bottom: 15px; color: var(--gold); }
+        .hp-bar { height: 28px; background: #222; border: 4px solid #fff; margin-bottom: 15px; }
+        #enemy-hp { height: 100%; background: linear-gradient(#cc0000, #ff4444); transition: width 0.4s ease; }
+        #enemy-text { font-size: 1.1rem; color: #ddd; min-height: 60px; }
+        #hero-action { margin: 30px 0; width: 90%; max-width: 500px; }
+        #hero-action button { width: 100%; padding: 25px; font-size: 1.6rem; background: linear-gradient(#ffd700, #ffcc00); color: #111; border: 8px solid #000; cursor: pointer; box-shadow: 0 10px 0 #000; transition: all 0.2s; }
+        #hero-action button:active { transform: translateY(6px); box-shadow: 0 4px 0 #000; }
+        #upgrades { width: 100%; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+        #upgrades button { padding: 14px; background: #222; border: 3px solid var(--gold); color: #fff; font-size: 1rem; cursor: pointer; transition: all 0.3s; }
+        #upgrades button:hover { background: var(--gold); color: #111; transform: scale(1.05); }
 
-        #hero-action {
-            margin: 30px 0;
-            width: 90%;
-            max-width: 500px;
-        }
-        #hero-action button {
-            width: 100%;
-            padding: 25px;
-            font-size: 1.6rem;
-            background: linear-gradient(#ffd700, #ffcc00);
-            color: #111;
-            border: 8px solid #000;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 10px 0 #000;
-            transition: all 0.2s;
-        }
-        #hero-action button:active {
-            transform: translateY(6px);
-            box-shadow: 0 4px 0 #000;
-        }
+        .fact-item { background: rgba(255,255,255,0.08); margin: 12px 0; padding: 18px; border-left: 6px solid var(--gold); font-size: 1.05rem; line-height: 1.6; }
 
-        #upgrades {
-            width: 100%;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px;
-        }
-        #upgrades button {
-            padding: 14px;
-            background: #222;
-            border: 3px solid var(--gold);
-            color: #fff;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        #upgrades button:hover {
-            background: var(--gold);
-            color: #111;
-            transform: scale(1.05);
-        }
+        .posters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; width: 100%; padding: 10px; }
+        .poster-card { background: #1a1a1a; border: 4px solid var(--red); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
+        .poster-card:hover { transform: scale(1.04); box-shadow: 0 0 20px var(--gold); }
+        .poster-img-wrap { width: 100%; height: 240px; position: relative; background: #111; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .poster-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.4s; }
+        .poster-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: linear-gradient(135deg, #1a0000, #2a1a00); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .poster-placeholder .star { font-size: 3.5rem; }
+        .poster-placeholder .ph-year { font-size: 1.4rem; color: var(--gold); }
+        .poster-img-wrap.error img { opacity: 0; }
+        .poster-img-wrap.error .poster-placeholder { opacity: 1; }
+        .poster-caption { padding: 14px; font-size: 0.9rem; text-align: center; color: #ddd; line-height: 1.5; border-top: 2px solid #333; }
 
-        /* ФАКТЫ */
-        #facts-list {
-            width: 100%;
-            max-width: 900px;
-            overflow-y: auto;
-            padding: 10px;
-        }
-        .fact-item {
-            background: rgba(255,255,255,0.08);
-            margin: 12px 0;
-            padding: 18px;
-            border-left: 6px solid var(--gold);
-            font-size: 1.05rem;
-            line-height: 1.4;
-        }
+        #archive-panel { position: absolute; bottom: 20px; right: 20px; width: 340px; background: rgba(10,10,10,0.98); border: 6px solid var(--gold); padding: 15px; box-shadow: 0 0 40px rgba(255,215,0,0.6); z-index: 10000; display: none; }
+        #archive-panel.show { display: block; }
+        .archive-img-wrap { width: 100%; height: 200px; background: #111; border: 4px solid #555; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+        .archive-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .archive-img-wrap .arch-placeholder { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #1a0000, #2a1a00); }
+        .archive-img-wrap.error img { display: none; }
+        .archive-img-wrap.error .arch-placeholder { display: flex; }
+        #archive-caption { font-size: 0.95rem; line-height: 1.5; color: #ddd; }
+        #archive-year-badge { font-size: 1.6rem; color: var(--gold); margin-bottom: 8px; }
 
-        /* МОМЕНТЫ ИСТОРИИ (ПЛАКАТЫ) */
-        .posters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            width: 100%;
-            padding: 10px;
-        }
-        .poster-card {
-            background: #222;
-            border: 4px solid var(--red);
-            overflow: hidden;
-            transition: transform 0.3s;
-        }
-        .poster-card:hover {
-            transform: scale(1.05);
-        }
-        .poster-card img {
-            width: 100%;
-            height: 260px;
-            object-fit: cover;
-            border-bottom: 3px solid #fff;
-            display: block;
-        }
-        .poster-caption {
-            padding: 12px;
-            font-size: 0.95rem;
-            text-align: center;
-            color: #ddd;
-        }
-
-        /* МОДАЛКИ */
-        .modal {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-        .modal-content {
-            background: #1a1a1a;
-            border: 8px solid var(--red);
-            max-width: 720px;
-            width: 92%;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 0 60px var(--gold);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .modal-content { background: #1a1a1a; border: 8px solid var(--red); max-width: 720px; width: 92%; padding: 30px; text-align: center; box-shadow: 0 0 60px var(--gold); max-height: 90vh; overflow-y: auto; }
         .modal h2 { color: var(--gold); margin-bottom: 20px; font-size: 1.8rem; }
-        .quiz-option {
-            display: block;
-            width: 100%;
-            padding: 18px;
-            margin: 12px 0;
-            background: #222;
-            border: 3px solid #555;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        .quiz-option { display: block; width: 100%; padding: 18px; margin: 12px 0; background: #222; border: 3px solid #555; font-size: 1.1rem; cursor: pointer; transition: 0.3s; color: #fff; }
         .quiz-option:hover { border-color: var(--gold); }
         .quiz-option.correct { background: #006600; border-color: #0f0; }
         .quiz-option.wrong { background: #660000; border-color: #f00; }
 
-        /* АРХИВНАЯ ПАНЕЛЬ */
-        #archive-panel {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 340px;
-            background: rgba(20,20,20,0.98);
-            border: 6px solid var(--gold);
-            padding: 15px;
-            box-shadow: 0 0 40px rgba(255,215,0,0.6);
-            z-index: 10000;
-            display: none;
-        }
-        #archive-panel.show { display: block; }
-        #archive-img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            border: 4px solid #fff;
-            margin-bottom: 12px;
-            display: block;
-        }
+        #screen-victory { background: linear-gradient(#111, #222); }
 
-        /* АНИМАЦИИ */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #111; padding: 15px 30px; font-size: 1.3rem; z-index: 99999; pointer-events: none; animation: toastAnim 2.5s forwards; }
+        @keyframes toastAnim { 0%{opacity:0;transform:translateX(-50%) translateY(20px)} 15%{opacity:1;transform:translateX(-50%) translateY(0)} 80%{opacity:1} 100%{opacity:0} }
         @keyframes glow { from { text-shadow: 0 0 10px var(--red); } to { text-shadow: 0 0 30px var(--gold); } }
         .hit { animation: hitAnim 0.3s ease; }
-        @keyframes hitAnim { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        @keyframes hitAnim { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
     </style>
 </head>
 <body>
 
-    <!-- ЭКРАН 1: ИНТРО -->
-    <div id="screen-intro" class="screen">
-        <div class="letter-bg">
-            <h1>ИСТОРИЯ СССР<br>БИТВА ЭПОХ</h1>
-            <button id="start-btn">НАЧАТЬ ТРАНСФОРМАЦИЮ</button>
-            <div style="position:absolute;bottom:20px;font-size:0.9rem;color:#aaa;">v3.3 • ВСЁ ВИДНО ПО ЛЮБАСУ • 100% НАДЁЖНЫЕ ИЗОБРАЖЕНИЯ</div>
-        </div>
+<div id="screen-intro" class="screen">
+    <div class="letter-bg">
+        <h1>ИСТОРИЯ СССР<br>БИТВА ЭПОХ</h1>
+        <button id="start-btn">НАЧАТЬ ТРАНСФОРМАЦИЮ</button>
+        <div style="position:absolute;bottom:20px;font-size:0.9rem;color:#aaa;">v3.4 • 200 ФАКТОВ • ИСПРАВЛЕННЫЕ ПЛАКАТЫ</div>
+    </div>
+</div>
+
+<div id="screen-video" class="screen hidden">
+    <video id="intro-video" playsinline autoplay>
+        <source src="https://github.com/alibahsburiev20-cyber/History/raw/main/hailuo_1774425491.mp4" type="video/mp4">
+    </video>
+</div>
+
+<div id="screen-loading" class="screen hidden">
+    <div class="loader-content">
+        <h2 id="fact-text">Знаете ли вы, что...</h2>
+        <div class="progress-bar"><div id="load-fill"></div></div>
+        <p>Загрузка 200 архивных фактов и 60 вопросов КГБ...</p>
+    </div>
+</div>
+
+<div id="screen-game" class="screen hidden">
+    <header>
+        <div id="year-tag">1922</div>
+        <div id="resources">СИЛА: <span id="power">15</span> ОЧКИ: <span id="score">0</span> ЗНАНИЕ: <span id="knowledge">50</span></div>
+        <button onclick="toggleArchive()" style="background:none;border:2px solid #ffd700;color:#ffd700;padding:8px 16px;font-size:1rem;cursor:pointer;">📼 АРХИВ</button>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(0)">БИТВА</button>
+        <button class="tab-btn" onclick="switchTab(1)">ФАКТЫ (200)</button>
+        <button class="tab-btn" onclick="switchTab(2)">ПЛАКАТЫ</button>
     </div>
 
-    <!-- ЭКРАН 2: ВИДЕО -->
-    <div id="screen-video" class="screen hidden">
-        <video id="intro-video" playsinline autoplay>
-            <source src="https://github.com/alibahsburiev20-cyber/History/raw/main/hailuo_1774425491.mp4" type="video/mp4">
-        </video>
-    </div>
-
-    <!-- ЭКРАН 3: ЗАГРУЗКА -->
-    <div id="screen-loading" class="screen hidden">
-        <div class="loader-content">
-            <h2 id="fact-text">Знаете ли вы, что...</h2>
-            <div class="progress-bar"><div id="load-fill"></div></div>
-            <p>Загрузка 120 архивных фактов и 95 вопросов КГБ...</p>
-        </div>
-    </div>
-
-    <!-- ЭКРАН 4: ИГРА -->
-    <div id="screen-game" class="screen hidden">
-        <header>
-            <div id="year-tag">1922</div>
-            <div id="resources">
-                СИЛА: <span id="power">15</span> 
-                ОЧКИ: <span id="score">0</span> 
-                ЗНАНИЕ: <span id="knowledge">50</span>
+    <div id="tab-0" class="tab-content active">
+        <div id="battle-zone">
+            <div id="enemy-card">
+                <h3 id="enemy-name">РАЗРУХА</h3>
+                <div class="hp-bar"><div id="enemy-hp"></div></div>
+                <div id="enemy-text">Гражданская война окончена. Восстанови страну!</div>
             </div>
-            <button onclick="toggleArchive()" style="background:none;border:2px solid #ffd700;color:#ffd700;padding:8px 16px;font-size:1rem;cursor:pointer;">📼 АРХИВ</button>
-        </header>
-
-        <!-- ТАБЫ -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab(0)">БИТВА</button>
-            <button class="tab-btn" onclick="switchTab(1)">ИНТЕРЕСНЫЕ ФАКТЫ (120)</button>
-            <button class="tab-btn" onclick="switchTab(2)">МОМЕНТЫ ИСТОРИИ (ПЛАКАТЫ)</button>
-        </div>
-
-        <!-- ТАБ 0: БИТВА -->
-        <div id="tab-0" class="tab-content active">
-            <div id="battle-zone">
-                <div id="enemy-card">
-                    <h3 id="enemy-name">РАЗРУХА</h3>
-                    <div class="hp-bar"><div id="enemy-hp"></div></div>
-                    <div id="enemy-text">Гражданская война окончена. Восстанови страну!</div>
-                </div>
-
-                <div id="hero-action">
-                    <button onclick="attack()">УДАРИТЬ РЕФОРМОЙ!</button>
-                    <div style="margin-top:12px;font-size:1rem;color:#aaa;">(удерживай кнопку для АВТО-АТАКИ)</div>
-                </div>
-
-                <!-- АРХИВНАЯ ПАНЕЛЬ -->
-                <div id="archive-panel">
-                    <img id="archive-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flag_of_the_Soviet_Union.svg/800px-Flag_of_the_Soviet_Union.svg.png" alt="Архив" onerror="this.onerror=null;this.src='https://github.com/alibahsburiev20-cyber/History/raw/main/1774424921197.png';">
-                    <div id="archive-caption" style="font-size:0.95rem;line-height:1.4;color:#ddd;"></div>
-                </div>
+            <div id="hero-action">
+                <button onclick="attack()">УДАРИТЬ РЕФОРМОЙ!</button>
+                <div style="margin-top:12px;font-size:1rem;color:#aaa;">(удерживай для АВТО-АТАКИ)</div>
             </div>
 
-            <div id="upgrades">
-                <button onclick="upgrade(8, 'ГОЭЛРО')">ГОЭЛРО +8 СИЛЫ</button>
-                <button onclick="upgrade(12, 'Коллективизация')">Колхозы +12 СИЛЫ</button>
-                <button onclick="upgrade(10, 'Космос')">Космическая программа +10 СИЛЫ</button>
-                <button onclick="upgrade(15, 'Оттепель')">Хрущёвская Оттепель +15 СИЛЫ</button>
-                <button onclick="upgrade(20, 'Перестройка')">Перестройка +20 СИЛЫ</button>
-                <button onclick="buyAutoAttack()">Авто-реформа (10 очков/сек)</button>
+            <div id="archive-panel">
+                <div id="archive-year-badge">1922</div>
+                <div class="archive-img-wrap" id="archive-img-wrap">
+                    <img id="archive-img" src="" alt="Архив">
+                    <div class="arch-placeholder">
+                        <div style="font-size:3rem;">☭</div>
+                        <div style="font-size:1rem;color:var(--gold);" id="archive-ph-year">1922</div>
+                    </div>
+                </div>
+                <div id="archive-caption"></div>
+                <button onclick="toggleArchive()" style="margin-top:12px;width:100%;padding:10px;background:#cc0000;border:none;color:#fff;font-size:1rem;cursor:pointer;">ЗАКРЫТЬ ✕</button>
             </div>
         </div>
 
-        <!-- ТАБ 1: ФАКТЫ -->
-        <div id="tab-1" class="tab-content">
-            <div id="facts-list"></div>
-        </div>
-
-        <!-- ТАБ 2: ПЛАКАТЫ -->
-        <div id="tab-2" class="tab-content">
-            <div class="posters-grid" id="posters-grid"></div>
-        </div>
-    </div>
-
-    <!-- МОДАЛКА ВИКТОРИНЫ -->
-    <div id="quiz-modal" class="modal">
-        <div class="modal-content">
-            <h2 id="quiz-title">ВИКТОРИНА ЭПОХИ</h2>
-            <p id="quiz-question" style="margin:20px 0;font-size:1.3rem;line-height:1.4;"></p>
-            <div id="quiz-options"></div>
-            <div id="quiz-result" style="margin-top:20px;font-size:1.3rem;min-height:40px;"></div>
-            <button onclick="nextQuestionOrClose()" id="quiz-next-btn" style="margin-top:20px;padding:15px 40px;background:#cc0000;color:#fff;border:none;font-size:1.2rem;display:none;">ПРОДОЛЖИТЬ →</button>
+        <div id="upgrades">
+            <button onclick="upgrade(8,'ГОЭЛРО')">ГОЭЛРО +8 СИЛЫ</button>
+            <button onclick="upgrade(12,'Коллективизация')">Колхозы +12 СИЛЫ</button>
+            <button onclick="upgrade(10,'Космос')">Космическая программа +10 СИЛЫ</button>
+            <button onclick="upgrade(15,'Оттепель')">Хрущёвская Оттепель +15 СИЛЫ</button>
+            <button onclick="upgrade(20,'Перестройка')">Перестройка +20 СИЛЫ</button>
+            <button onclick="buyAutoAttack()">Авто-реформа (10 очков/сек)</button>
         </div>
     </div>
 
-    <!-- ФИНАЛЬНЫЙ ЭКРАН ПОБЕДЫ -->
-    <div id="screen-victory" class="screen hidden" style="background: linear-gradient(#111, #222);">
-        <div style="text-align:center;max-width:700px;">
-            <h1 style="font-size:3rem;color:var(--gold);margin-bottom:30px;">ПОБЕДА!<br>СССР — ВЕЛИКАЯ ДЕРЖАВА</h1>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Sputnik_1.jpg/800px-Sputnik_1.jpg" style="width:80%;max-width:500px;border:8px solid #ffd700;margin-bottom:30px;" alt="Спутник">
-            <p style="font-size:1.4rem;margin-bottom:40px;">Вы прошли всю историю СССР!<br>Финальная сила: <span id="final-power" style="color:#ffd700"></span><br>Знание: <span id="final-knowledge" style="color:#ffd700"></span></p>
-            <button onclick="location.reload()" style="padding:20px 60px;font-size:1.6rem;background:var(--red);border:6px solid var(--gold);">НАЧАТЬ ЗАНОВО</button>
-        </div>
+    <div id="tab-1" class="tab-content">
+        <div id="facts-list"></div>
     </div>
 
-    <script>
-        // ==================== ДАННЫЕ ====================
-        const facts = [ /* те же 120 фактов */ 
-            "В 1922 году образован СССР — союз 4 республик.", "ГОЭЛРО — первый в мире план электрификации всей страны (1920).",
-            "Первый спутник Земли запущен 4 октября 1957 года.", "Хрущёвская оттепель (1956) открыла свободу в искусстве.",
-            "Сталинградская битва (1942–1943) — перелом в Великой Отечественной войне.", "Байконур — первый космодром человечества.",
-            "Коллективизация 1929–1933 годов изменила сельское хозяйство.", "Первый полёт человека в космос — Юрий Гагарин, 12 апреля 1961.",
-            "Москва 1980 — Олимпийские игры, несмотря на бойкот.", "Перестройка (1985) и гласность Михаила Горбачёва.",
-            "Великая Октябрьская революция 1917 года заложила основу СССР.", "Победа 9 мая 1945 — День Победы над фашизмом.",
-            "Целина — освоение казахстанских степей в 1950-х.", "Первый в мире реактивный пассажирский самолёт Ту-104 (1955).",
-            "Ленинградская блокада длилась 872 дня.", "СССР первым вышел в открытый космос — Алексей Леонов, 1965.",
-            "Союз и Аполлон — первая стыковка космических кораблей (1975).", "БАМ — Байкало-Амурская магистраль, грандиозная стройка 1970–80-х.",
-            "Чернобыльская трагедия 26 апреля 1986 года.", "Распад СССР 26 декабря 1991 года — конец эпохи.",
-            "В 1930 году в СССР был запущен первый в мире пятилетний план.", "СССР построил более 1500 новых городов за 70 лет.",
-            "В 1949 году СССР испытал первую атомную бомбу.", "В 1953 году запущена первая в мире водородная бомба.",
-            "СССР помогал 60 странам Африки и Азии в строительстве.", "В 1970 году запущена первая в мире автоматическая станция на Луну.",
-            "СССР имел самую большую в мире сеть метрополитенов.", "В 1980 году в Москве прошли Олимпийские игры.",
-            "СССР первым запустил женщину в космос — Валентина Терешкова.", "В 1960-е годы СССР построил самый большой в мире самолёт Ан-225.",
-            "СССР дал миру 22 космонавта-героя.", "В 1937 году Папанинцы впервые зимовали на Северном полюсе.",
-            "СССР производил 20% мирового электричества в 1980-е.", "В 1957 году открыт первый в мире атомный ледокол «Ленин».",
-            "СССР создал первую в мире систему ПВО С-75.", "В 1972 году СССР и США подписали договор ОСВ-1.",
-            "СССР помогал Вьетнаму и Кубе в борьбе с империализмом.", "В 1986 году запущена станция «Мир» — первая модульная орбитальная станция.",
-            "СССР разработал первый в мире сверхзвуковой пассажирский самолёт Ту-144.", "В 1941–1945 годах СССР потерял 27 миллионов человек.",
-            "СССР первым применил парашютный десант в бою (1939).", "В 1924 году умер В.И. Ленин, а в 1924–1930 годах построен Мавзолей.",
-            "СССР ввёл всеобщее начальное образование в 1930 году.", "В 1950-е годы СССР запустил первую в мире АЭС в Обнинске.",
-            "СССР помогал Индии построить металлургические заводы.", "В 1979 году СССР ввёл войска в Афганистан.",
-            "СССР создал первую в мире систему спутниковой связи «Молния».", "В 1969 году СССР впервые доставил грунт Луны на Землю.",
-            "СССР имел самую большую в мире армию в 1980-е годы.", "В 1935 году в СССР введена стахановское движение.",
-            "СССР построил более 100 000 километров железных дорог.", "В 1956 году Хрущёв осудил культ личности Сталина.",
-            "СССР первым запустил межконтинентальную баллистическую ракету.", "В 1980-е годы СССР экспортировал газ в Европу по «Голубому потоку».",
-            "СССР создал первый в мире искусственный спутник и космонавтику.", "В 1943 году в СССР прошла Тегеранская конференция.",
-            "СССР помогал Китаю в 1950-е годы строить промышленность.", "В 1975 году СССР и США провели совместный космический полёт.",
-            "СССР имел 15 союзных республик на момент распада.", "В 1920-е годы в СССР прошла НЭП — новая экономическая политика.",
-            "СССР первым в мире ввёл 8-часовой рабочий день.", "В 1939 году СССР и Германия подписали пакт Молотова-Риббентропа.",
-            "СССР создал первый в мире ядерный реактор.", "В 1961 году Юрий Гагарин сказал «Поехали!».",
-            "СССР построил самый большой в мире стадион в Лужниках.", "В 1989 году в СССР прошла первая сессия Съезда народных депутатов.",
-            "СССР первым запустил ракету-носитель «Восток».", "В 1954 году в СССР прошла первая в мире АЭС.",
-            "СССР помогал странам Варшавского договора.", "В 1945 году СССР взял Берлин и закончил Вторую мировую войну.",
-            "СССР создал первую в мире систему цветного телевидения.", "В 1970-е годы СССР экспортировал оружие в 70 стран.",
-            "СССР имел самый большой в мире флот атомных подводных лодок.", "В 1936 году в СССР принята «Сталинская» Конституция.",
-            "СССР первым запустил автоматическую межпланетную станцию.", "В 1963 году в СССР запущен первый в мире спутник связи.",
-            "СССР помогал Кубе в 1962 году во время Карибского кризиса.", "В 1985 году Горбачёв начал политику «ускорения».",
-            "СССР создал первую в мире систему спутников ГЛОНАСС.", "В 1949 году создан Совет Экономической Взаимопомощи (СЭВ).",
-            "СССР первым в мире применил лазерное оружие в космосе.", "В 1957 году в СССР открыт первый в мире Институт ядерных исследований.",
-            "СССР построил более 5000 новых школ за 10 лет после войны.", "В 1971 году СССР запустил первую орбитальную станцию «Салют».",
-            "СССР имел самый большой в мире запас золота в 1980-е.", "В 1934 году в СССР введён паспортный режим.",
-            "СССР первым запустил ракету с ядерной боеголовкой.", "В 1968 году СССР ввёл войска в Чехословакию.",
-            "СССР создал первый в мире сверхзвуковой бомбардировщик Ту-22.", "В 1952 году в СССР прошёл XIX съезд КПСС.",
-            "СССР помогал Анголe, Мозамбику и Эфиопии.", "В 1980-е годы СССР производил 1/5 мирового алюминия.",
-            "СССР первым запустил человека на орбиту.", "В 1940 году в СССР присоединены Прибалтийские республики.",
-            "СССР имел самую большую в мире сеть детских садов.", "В 1977 году принята новая Конституция СССР.",
-            "СССР создал первую в мире систему противоракетной обороны.", "В 1955 году создан Варшавский договор.",
-            "СССР первым запустил автоматический аппарат на Венеру.", "В 1986 году в СССР прошла XXVII съезд КПСС.",
-            "СССР построил самый большой в мире ледокол «Арктика».", "В 1939–1940 годах прошла советско-финская война.",
-            "СССР помогал Испании в 1936–1939 годах.", "В 1964 году в СССР снят первый цветной широкоформатный фильм.",
-            "СССР имел самый большой в мире парк тракторов.", "В 1921 году прошёл X съезд РКП(б) и введена НЭП.",
-            "СССР первым запустил спутник-ретранслятор.", "В 1947 году в СССР испытана первая баллистическая ракета Р-1.",
-            "СССР помогал Северной Корее в 1950–1953 годах.", "В 1988 году в СССР произошёл Спитакское землетрясение.",
-            "СССР создал первую в мире систему космической навигации.", "В 1950 году в СССР запущена первая серийная АЭС.",
-            "СССР имел самую большую в мире сеть библиотек."
-        ];
+    <div id="tab-2" class="tab-content">
+        <div class="posters-grid" id="posters-grid"></div>
+    </div>
+</div>
 
-        const allQuizzes = [ /* те же 95 вопросов */ 
-            { q: "Когда был официально образован СССР?", a: ["1922", "1917", "1945", "1957"], correct: 0 },
-            { q: "Что такое ГОЭЛРО?", a: ["План электрификации", "Первый спутник", "Колхоз", "Космическая программа"], correct: 0 },
-            { q: "Кто первым полетел в космос?", a: ["Юрий Гагарин", "Алексей Леонов", "Валентина Терешкова", "Сергей Королёв"], correct: 0 },
-            { q: "Какой город выдержал 872-дневную блокаду?", a: ["Ленинград", "Москва", "Сталинград", "Киев"], correct: 0 },
-            { q: "Когда произошла Сталинградская битва?", a: ["1942–1943", "1941", "1945", "1939"], correct: 0 },
-            { q: "Что символизировал запуск «Спутника-1»?", a: ["Начало космической эры", "Победу в войне", "Коллективизацию", "Перестройку"], correct: 0 },
-            { q: "Кто произнёс речь «О культе личности»?", a: ["Хрущёв", "Сталин", "Ленин", "Горбачёв"], correct: 0 },
-            { q: "Где состоялась первая стыковка «Союз-Аполлон»?", a: ["В космосе", "На Луне", "В Москве", "В Вашингтоне"], correct: 0 },
-            { q: "Что такое «Целина»?", a: ["Освоение степей Казахстана", "Строительство БАМа", "Ядерная программа", "Олимпиада-80"], correct: 0 },
-            { q: "Когда был поднят красный флаг над Рейхстагом?", a: ["1 мая 1945", "9 мая 1945", "22 июня 1941", "7 ноября 1917"], correct: 0 },
-            { q: "Какой самолёт стал первым реактивным пассажирским?", a: ["Ту-104", "Ил-62", "Ан-2", "Ту-134"], correct: 0 },
-            { q: "Что произошло 26 апреля 1986 года?", a: ["Авария на Чернобыльской АЭС", "Запуск спутника", "Полёт Гагарина", "Олимпиада в Москве"], correct: 0 },
-            { q: "Кто был Генеральным секретарём в 1985–1991?", a: ["Михаил Горбачёв", "Леонид Брежнев", "Никита Хрущёв", "Иосиф Сталин"], correct: 0 },
-            { q: "Сколько республик входило в СССР на момент распада?", a: ["15", "4", "11", "9"], correct: 0 },
-            { q: "Какой праздник отмечается 9 мая?", a: ["День Победы", "День Конституции", "День Космонавтики", "День Октябрьской революции"], correct: 0 },
-            { q: "В каком году был запущен первый искусственный спутник Земли?", a: ["1957", "1961", "1945", "1975"], correct: 0 },
-            { q: "Кто был первым человеком, вышедшим в открытый космос?", a: ["Алексей Леонов", "Юрий Гагарин", "Валентина Терешкова", "Герман Титов"], correct: 0 },
-            { q: "Как назывался первый пятилетний план СССР?", a: ["ГОЭЛРО", "Пятилетка индустриализации", "НЭП", "Коллективизация"], correct: 1 },
-            { q: "В каком году СССР испытал первую атомную бомбу?", a: ["1949", "1953", "1961", "1975"], correct: 0 },
-            { q: "Кто был автором плаката «Родина-мать зовёт!»?", a: ["Ираклий Тоидзе", "Дмитрий Моор", "Виктор Корецкий", "Алексей Кокорекин"], correct: 0 },
-            { q: "В каком году произошла Хрущёвская оттепель?", a: ["1956", "1961", "1945", "1985"], correct: 0 },
-            { q: "Что такое БАМ?", a: ["Байкало-Амурская магистраль", "Балтийско-Амурский мост", "Большая Атомная Магистраль", "Брест-Амурский маршрут"], correct: 0 },
-            { q: "В каком году был запущен первый космонавт?", a: ["1961", "1957", "1975", "1986"], correct: 0 },
-            { q: "Сколько дней длилась блокада Ленинграда?", a: ["872", "1418", "900", "1200"], correct: 0 },
-            { q: "Кто был первым космонавтом-женщиной?", a: ["Валентина Терешкова", "Светлана Савицкая", "Анна Фишер", "Терешкова-Савицкая"], correct: 0 },
-            { q: "В каком году СССР и США провели стыковку «Союз-Аполлон»?", a: ["1975", "1969", "1980", "1991"], correct: 0 },
-            { q: "В каком году была запущена первая АЭС в Обнинске?", a: ["1954", "1961", "1949", "1975"], correct: 0 },
-            { q: "В каком году произошёл Карибский кризис?", a: ["1962", "1956", "1979", "1986"], correct: 0 },
-            { q: "Что такое СЭВ?", a: ["Совет Экономической Взаимопомощи", "Союз Электрических Войск", "Секретный Экономический Вопрос", "Союз Экологических Войн"], correct: 0 }
-        ];
+<div id="quiz-modal" class="modal">
+    <div class="modal-content">
+        <h2 id="quiz-title">ВИКТОРИНА ЭПОХИ</h2>
+        <p id="quiz-question" style="margin:20px 0;font-size:1.3rem;line-height:1.5;"></p>
+        <div id="quiz-options"></div>
+        <div id="quiz-result" style="margin-top:20px;font-size:1.3rem;min-height:40px;"></div>
+        <button onclick="nextQuestionOrClose()" id="quiz-next-btn" style="margin-top:20px;padding:15px 40px;background:#cc0000;color:#fff;border:none;font-size:1.2rem;display:none;">ПРОДОЛЖИТЬ →</button>
+    </div>
+</div>
 
-        const levels = [
-            { year: 1922, enemy: "РАЗРУХА", hp: 80, text: "Гражданская война окончена. Восстанови страну!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flag_of_the_Soviet_Union.svg/800px-Flag_of_the_Soviet_Union.svg.png", caption: "30 декабря 1922. Декларация об образовании СССР." },
-            { year: 1930, enemy: "ГОЛОД И КОЛЛЕКТИВИЗАЦИЯ", hp: 120, text: "Колхозы или смерть? Выбирай путь индустриализации!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Tractor_stalin.jpg/800px-Tractor_stalin.jpg", caption: "Сталинские трактора. Коллективизация 1930-х." },
-            { year: 1941, enemy: "ФАШИСТСКАЯ ИНТЕРВЕНЦИЯ", hp: 250, text: "22 июня. Враг у ворот! Защити Родину!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/1941_Soviet_poster.jpg/800px-1941_Soviet_poster.jpg", caption: "Плакат 1941 года: «Родина-мать зовёт!»" },
-            { year: 1945, enemy: "ПОСЛЕДНИЙ БОЙ", hp: 180, text: "Берлин. Знамя Победы над Рейхстагом!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Reichstag_flag.jpg/800px-Reichstag_flag.jpg", caption: "9 мая 1945. Знамя Победы над Рейхстагом." },
-            { year: 1955, enemy: "ЗАСТОЙ В ИДЕЯХ", hp: 140, text: "Оттепель! Разморозь культуру и науку!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Sputnik_1.jpg/800px-Sputnik_1.jpg", caption: "Первый искусственный спутник Земли, 1957." },
-            { year: 1961, enemy: "КОСМИЧЕСКАЯ ГОНКА", hp: 200, text: "Гагарин в космосе! Покажи капиталистам!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Yuri_Gagarin_1961.jpg/800px-Yuri_Gagarin_1961.jpg", caption: "12 апреля 1961. Юрий Гагарин — первый человек в космосе." },
-            { year: 1970, enemy: "ХОЛОДНАЯ ВОЙНА", hp: 220, text: "Соревнование систем. Укрепи идеологию!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Apollo_Soyuz.jpg/800px-Apollo_Soyuz.jpg", caption: "Программа «Союз-Аполлон» — 1975." },
-            { year: 1985, enemy: "ПЕРЕСТРОЙКА", hp: 190, text: "Гласность и ускорение. Новый курс!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Gorbachev_and_Reagan.jpg/800px-Gorbachev_and_Reagan.jpg", caption: "Горбачёв и Рейган. Рейкьявик, 1986." },
-            { year: 1991, enemy: "РАСПАД", hp: 300, text: "Последний бой за Союз. Сможешь удержать?", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/USSR_flag_lowered.jpg/800px-USSR_flag_lowered.jpg", caption: "26 декабря 1991. Флаг СССР спущен навсегда." }
-        ];
+<div id="screen-victory" class="screen hidden">
+    <div style="text-align:center;max-width:700px;">
+        <h1 style="font-size:3rem;color:var(--gold);margin-bottom:30px;">ПОБЕДА!<br>СССР — ВЕЛИКАЯ ДЕРЖАВА</h1>
+        <div style="font-size:6rem;margin-bottom:20px;">☭</div>
+        <p style="font-size:1.4rem;margin-bottom:40px;">Вы прошли всю историю СССР!<br>Финальная сила: <span id="final-power" style="color:#ffd700"></span><br>Знание: <span id="final-knowledge" style="color:#ffd700"></span></p>
+        <button onclick="location.reload()" style="padding:20px 60px;font-size:1.6rem;background:var(--red);border:6px solid var(--gold);color:#fff;cursor:pointer;">НАЧАТЬ ЗАНОВО</button>
+    </div>
+</div>
 
-        // 100% НАДЁЖНЫЕ ПЛАКАТЫ + fallback на флаг СССР и на твою картинку с GitHub
-        const DEFAULT_IMAGE = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flag_of_the_Soviet_Union.svg/800px-Flag_of_the_Soviet_Union.svg.png";
-        const GITHUB_FALLBACK = "https://github.com/alibahsburiev20-cyber/History/raw/main/1774424921197.png";
+<script>
+const facts = [
+    "В 1922 году образован СССР — союз 4 республик: РСФСР, Украинской, Белорусской и Закавказской ССР.",
+    "ГОЭЛРО (1920) — первый в мире государственный план электрификации целой страны.",
+    "НЭП (новая экономическая политика) 1921–1928 годов позволила восстановить разрушенную экономику.",
+    "Первая Конституция СССР принята в 1924 году, через несколько дней после смерти Ленина.",
+    "Столица СССР была перенесена из Петрограда в Москву в 1918 году.",
+    "В 1924 году умер Владимир Ильич Ленин; его тело забальзамировано и помещено в Мавзолей.",
+    "В 1920-е годы в СССР была ликвидирована неграмотность среди взрослого населения.",
+    "Первая советская пятилетка (1928–1932) позволила создать тяжёлую промышленность.",
+    "В 1930 году в СССР введено всеобщее начальное образование.",
+    "Московское метро открыто в 1935 году и стало одним из красивейших в мире.",
+    "В 1936 году принята «Сталинская» Конституция СССР.",
+    "В 1934 году убит Сергей Киров — повод для начала Большого террора.",
+    "Стахановское движение 1935 года — соревнование за рекорды производительности труда.",
+    "В 1939 году СССР и Германия подписали пакт Молотова–Риббентропа о ненападении.",
+    "В 1939–1940 годах прошла советско-финская (Зимняя) война.",
+    "В 1940 году к СССР присоединены Прибалтийские республики.",
+    "В 1949 году СССР испытал первую атомную бомбу, нарушив монополию США.",
+    "В 1953 году СССР испытал водородную бомбу — термоядерное оружие.",
+    "Первая в мире АЭС запущена в Обнинске в 1954 году мощностью 5 МВт.",
+    "22 июня 1941 года Германия вероломно напала на СССР без объявления войны.",
+    "Битва за Москву (1941–1942) — первое крупное поражение вермахта.",
+    "Ленинградская блокада длилась 872 дня — с 8 сентября 1941 по 27 января 1944.",
+    "Сталинградская битва (1942–1943) — коренной перелом в Великой Отечественной войне.",
+    "Курская битва (1943) — крупнейшее танковое сражение в истории человечества.",
+    "Операция «Багратион» (1944) уничтожила группу армий «Центр».",
+    "9 мая 1945 года СССР одержал победу над нацистской Германией.",
+    "СССР потерял около 27 миллионов человек в годы Второй мировой войны.",
+    "Тегеранская конференция 1943 года — первая встреча «Большой тройки».",
+    "Ялтинская конференция 1945 года определила послевоенное устройство мира.",
+    "4 октября 1957 года СССР запустил первый искусственный спутник Земли «Спутник-1».",
+    "12 апреля 1961 года Юрий Гагарин стал первым человеком в космосе. «Поехали!»",
+    "Алексей Леонов 18 марта 1965 года первым вышел в открытый космос.",
+    "Валентина Терешкова (1963) — первая женщина-космонавт.",
+    "В 1966 году советская станция «Луна-9» совершила первую мягкую посадку на Луну.",
+    "В 1970 году «Луноход-1» работал на Луне 10 месяцев.",
+    "В 1971 году запущена «Салют-1» — первая в мире орбитальная космическая станция.",
+    "В 1975 году состоялась стыковка «Союз–Аполлон» — символ разрядки СССР и США.",
+    "Первый атомный ледокол «Ленин» спущен на воду в 1957 году.",
+    "В 1986 году орбитальная станция «Мир» стала первой модульной космической станцией.",
+    "В 1956 году Хрущёв произнёс доклад «О культе личности» на XX съезде КПСС.",
+    "Хрущёвская оттепель открыла путь к либерализации культуры.",
+    "Освоение целины (1954–1960): в Казахстане распахали 42 миллиона гектаров земли.",
+    "Берлинская стена построена в 1961 году за одну ночь.",
+    "Карибский кризис 1962 года поставил мир на грань ядерной войны.",
+    "В 1964 году Хрущёв был смещён; Брежнев пришёл к власти.",
+    "Советское цветное телевидение по системе СЕКАМ введено в 1967 году.",
+    "«Застой» 1970-х — период стабильности, но замедления развития.",
+    "В 1968 году войска СССР вошли в Чехословакию («Пражская весна»).",
+    "В 1972 году Брежнев и Никсон подписали ОСВ-1.",
+    "Московская Олимпиада 1980 года прошла в условиях бойкота 65 государств.",
+    "БАМ (Байкало-Амурская магистраль) строился с 1974 по 1984 год.",
+    "В 1979 году СССР ввёл войска в Афганистан — война длилась почти 10 лет.",
+    "В 1975 году 35 государств подписали Хельсинкский акт о правах человека.",
+    "Михаил Горбачёв стал Генеральным секретарём ЦК КПСС в марте 1985 года.",
+    "«Гласность» — политика открытости, позволившая критиковать власть.",
+    "26 апреля 1986 года — авария на Чернобыльской АЭС.",
+    "В 1988 году Горбачёв объявил о выводе советских войск из Афганистана.",
+    "В 1989 году прошли первые альтернативные выборы народных депутатов СССР.",
+    "19–22 августа 1991 года — попытка государственного переворота (ГКЧП).",
+    "8 декабря 1991 года подписано Беловежское соглашение о роспуске СССР.",
+    "26 декабря 1991 года СССР официально прекратил существование.",
+    "Советский физик Пётр Капица получил Нобелевскую премию (1978).",
+    "Лев Ландау — советский физик-теоретик, нобелевский лауреат 1962 года.",
+    "ТУ-144 (1968) — первый в мире сверхзвуковой пассажирский самолёт.",
+    "СССР создал ГЛОНАСС — спутниковую навигационную систему.",
+    "В СССР работал крупнейший в мире радиотелескоп РАТАН-600.",
+    "«Война и мир» Бондарчука (1965–1967) — получила премию «Оскар».",
+    "Советский балет — Большой театр — считался лучшим балетным коллективом мира.",
+    "СССР выиграл первую золотую олимпийскую медаль в 1952 году в Хельсинки.",
+    "Хоккейная дружина СССР доминировала в мировом хоккее с 1954 по 1991 год.",
+    "«Суперсерия» 1972 года: советские хоккеисты сыграли вничью с профессионалами НХЛ.",
+    "Советские шахматисты держали звание чемпиона мира с 1948 по 1972 год.",
+    "Советская армия была крупнейшей в мире в годы холодной войны.",
+    "Танк Т-34 — лучший танк Второй мировой, выпущен в количестве 57 000 штук.",
+    "АК-47 Калашникова — самый распространённый автомат в мире: более 100 млн единиц.",
+    "СССР создал первую в мире систему противоракетной обороны А-35 вокруг Москвы.",
+    "Атомная подводная лодка «Ленинский комсомол» (1958) — первая советская АПЛ.",
+    "В 1957 году создан стратегический бомбардировщик Ту-95.",
+    "Система «Периметр» — автоматический ответный ядерный удар при уничтожении командования.",
+    "СССР произвёл более 50 000 ядерных боеголовок — крупнейший арсенал в истории.",
+    "Магнитогорск — «город-завод», построенный за 2 года (1929–1931).",
+    "Строительство ДнепроГЭС (1927–1932) — крупнейшей ГЭС Европы того времени.",
+    "СССР в 1970-е годы обеспечивал 20% мирового производства нефти и газа.",
+    "СССР в 1980-е экспортировал нефть и газ в обмен на западные технологии.",
+    "Программа «хрущёвок» дала жильё 50 миллионам советских граждан за 20 лет.",
+    "Коминтерн (1919–1943) — международная организация коммунистов мира.",
+    "Варшавский договор (1955) — военный союз СССР и стран Восточного блока.",
+    "СЭВ (1949) — Совет Экономической Взаимопомощи, аналог ЕС для соцстран.",
+    "Советский Союз поддерживал национально-освободительные движения в Африке и Азии.",
+    "Советско-китайский раскол (1960) — идеологический разрыв двух крупнейших соцстран.",
+    "Встреча Горбачёва и Рейгана в Рейкьявике (1986) чуть не привела к ядерному разоружению.",
+    "Советский человек читал больше всех в мире: тираж газет — 180 млн экземпляров в день.",
+    "Самиздат — подпольное распространение запрещённой литературы в самодельных копиях.",
+    "Советская система здравоохранения была бесплатной и охватывала всё население.",
+    "Уровень грамотности в СССР вырос с 28% (1917) до почти 100% к 1970-м годам.",
+    "Пионерская организация объединяла 25 миллионов детей и подростков СССР.",
+    "«Буран» (1988) — советский многоразовый космический корабль, слетавший беспилотно.",
+    "Ракета «Энергия» (1987) была способна вывести на орбиту 100 тонн груза.",
+    "СССР провёл более 715 ядерных испытаний — второй показатель после США.",
+    "Чернобыльская катастрофа выбросила радиацию, в 400 раз превышающую Хиросиму.",
+    "Аральское море начало катастрофически усыхать из-за советской ирригации (с 1960-х).",
+    "Спитакское землетрясение 1988 года в Армении унесло более 25 000 жизней.",
+    "В 1957 году на Урале взорвались советские ядерные отходы — авария на «Маяке».",
+    "Юрий Гагарин погиб 27 марта 1968 года при крушении самолёта МиГ-15УТИ.",
+    "Сергей Королёв — главный конструктор советской космической программы, державшийся в тайне.",
+    "Андрей Сахаров — создатель водородной бомбы, ставший диссидентом.",
+    "Александр Солженицын — автор «Архипелага ГУЛАГ», выслан из СССР в 1974 году.",
+    "Владимир Высоцкий — бард и актёр, голос целого поколения, умер в 1980 году.",
+    "Дмитрий Шостакович написал «Ленинградскую симфонию» в осаждённом городе (1941).",
+    "Михаил Булгаков написал «Мастера и Маргариту» в стол — роман опубликован после смерти.",
+    "Лётчик Валерий Чкалов в 1937 году перелетел через Северный полюс из Москвы в США.",
+    "В СССР построено 7 сталинских высоток — «семь сестёр» Москвы.",
+    "Советский Союз занимал 1/6 часть суши Земли — самое большое государство в истории.",
+    "Советская научная фантастика создала уникальный жанр — братья Стругацкие, Ефремов.",
+    "Медведь «Миша» — талисман Олимпиады-80 — стал одним из самых известных символов.",
+    "За 70 лет в СССР построено более 1500 новых городов.",
+    "Советская армия имела 50 000 танков в 1980-е — больше чем весь остальной мир.",
+    "«Доктрина Трумэна» (1947) ознаменовала начало холодной войны между США и СССР.",
+    "В 1960 году американский самолёт-шпион U-2 был сбит советской ракетой над Уралом.",
+    "«Ядерный чемоданчик» — система управления советским ядерным арсеналом (1983).",
+    "Советский Союз бойкотировал Олимпийские игры в Лос-Анджелесе в 1984 году.",
+    "Вывод войск из Афганистана завершён 15 февраля 1989 года.",
+    "В 1969 году произошли бои на острове Даманский — конфликт СССР с Китаем.",
+    "Первый в мире ядерный ледокол «Арктика» достиг Северного полюса в 1977 году.",
+    "Иван Папанин в 1937–1938 годах провёл первую дрейфующую полярную экспедицию «СП-1».",
+    "СССР производил 20% мирового алюминия и 15% мировой стали в 1970-е годы.",
+    "В СССР работало более 90 вузов только в одной Москве.",
+    "Советский ВПК занимал 25% экономики всей страны.",
+    "В 1949 году создан Совет Экономической Взаимопомощи (СЭВ).",
+    "Первый советский пятилетний план (1928–1932) превратил аграрную страну в промышленную.",
+    "Берлинский воздушный мост (1948–1949) — первый острый кризис холодной войны.",
+    "СССР поддержал Северную Корею в войне 1950–1953 годов техникой и советниками.",
+    "В 1971 году запущена первая орбитальная станция «Салют» — прообраз МКС.",
+    "Советские учёные первыми синтезировали антивещество в ускорителе в Дубне.",
+    "«Магнитиздат» — запись и распространение запрещённой музыки на магнитных лентах.",
+    "Советское образование считалось одним из лучших в мире в точных науках.",
+    "Канал Москва–Волга (1937) длиной 128 км прорыт за 4,5 года.",
+    "В 1984 году СССР бойкотировал Олимпиаду в ответ на бойкот Москвы-80.",
+    "СССР имел самую большую в мире сеть детских садов и яслей.",
+    "В 1955 году создан Варшавский договор — военный блок в противовес НАТО.",
+    "Советский гимн написан в 1944 году; его мелодия используется в России до сих пор.",
+    "В 1961 году на XXII съезде принята программа построения коммунизма к 1980 году.",
+    "Советский хоккей: Владислав Третьяк считается лучшим вратарём всех времён.",
+    "СССР первым в мире ввёл 8-часовой рабочий день после революции 1917 года.",
+    "В 1953 году после смерти Сталина начался период «коллективного руководства».",
+    "Советский Союз признал Израиль в 1948 году первым среди крупных держав.",
+    "В 1963 году в СССР запущен первый спутник-ретранслятор системы «Молния».",
+    "СССР помогал Кубе после революции 1959 года нефтью и техническими специалистами.",
+    "Кукурузная кампания Хрущёва охватила даже районы, непригодные для этой культуры.",
+    "«Доктрина Брежнева» оставляла за СССР право вмешиваться в дела соцстран.",
+    "Михаил Ботвинник, Спасский, Петросян — легенды советских шахмат.",
+    "В 1957 году открыт первый в мире Институт ядерных исследований в Дубне.",
+    "СССР построил более 100 000 км железных дорог за 70 лет существования.",
+    "В СССР за послевоенные годы построено более 5000 новых школ.",
+    "Советские учёные первыми получили синтетические алмазы в промышленных масштабах (1960).",
+    "В 1935 году введена советская система орденов и медалей: орден Ленина, Красной Звезды.",
+    "Советская разведка КГБ в годы холодной войны имела агентов в 60+ странах мира.",
+    "В 1989 году в СССР прошла первая сессия Съезда народных депутатов — прямой эфир.",
+    "Майя Плисецкая и Галина Уланова — звёзды советского балета мирового уровня.",
+    "Советский фильм «Иди и смотри» (1985) о войне признан одним из лучших в истории кино.",
+    "В СССР построено 7 подземных ядерных взрывов для промышленных целей — «Мирный атом».",
+    "Советский Союз первым в мире запустил геостационарный спутник связи (1974).",
+    "В 1980-е годы СССР экспортировал оружие более чем в 70 стран мира.",
+    "Советская система ПВО С-75 сбила в 1960 году американский самолёт-шпион U-2.",
+    "Первый полёт советского сверхзвукового бомбардировщика Ту-22 состоялся в 1958 году.",
+    "В 1977 году принята последняя Конституция СССР — «брежневская».",
+    "Советский цирк был признан одним из лучших в мире — гастролировал в 50+ странах.",
+    "Программа «Интеркосмос» позволила космонавтам из 9 соцстран полететь на советских кораблях.",
+    "В 1969 году советская станция «Венера-5» передала данные из атмосферы Венеры.",
+    "Советские полярники основали более 40 научных станций в Арктике и Антарктиде.",
+    "В 1980 году в СССР насчитывалось более 600 000 врачей — одна из крупнейших медсистем.",
+    "Советская мультипликация — «Союзмультфильм» — создала более 1500 мультфильмов.",
+    "«Ну, погоди!» (1969) стал самым популярным советским мультсериалом всех времён.",
+    "В СССР в 1970-е годы выпускалось более 2 млрд экземпляров книг в год.",
+    "Советские космонавты провели на орбите суммарно более 30 лет — рекорд человечества.",
+    "В 1991 году Горбачёв получил Нобелевскую премию мира за окончание холодной войны.",
+    "Последний советский флаг был спущен над Кремлём 25 декабря 1991 года в 19:32."
+];
 
-        const posters = [
-            { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/1941_Soviet_poster.jpg/1024px-1941_Soviet_poster.jpg", caption: "«Родина-мать зовёт!» Ираклий Тоидзе, 1941" },
-            { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flag_of_the_Soviet_Union.svg/1024px-Flag_of_the_Soviet_Union.svg.png", caption: "Флаг СССР. 1922–1991" },
-            { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Reichstag_flag.jpg/1024px-Reichstag_flag.jpg", caption: "Знамя Победы над Рейхстагом. 9 мая 1945" },
-            { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Sputnik_1.jpg/1024px-Sputnik_1.jpg", caption: "Первый спутник Земли. 1957" },
-            { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Yuri_Gagarin_1961.jpg/1024px-Yuri_Gagarin_1961.jpg", caption: "Юрий Гагарин. 12 апреля 1961" },
-            { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Apollo_Soyuz.jpg/1024px-Apollo_Soyuz.jpg", caption: "Стыковка «Союз-Аполлон». 1975" },
-            { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Gorbachev_and_Reagan.jpg/1024px-Gorbachev_and_Reagan.jpg", caption: "Горбачёв и Рейган. Рейкьявик, 1986" },
-            { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/USSR_flag_lowered.jpg/1024px-USSR_flag_lowered.jpg", caption: "Спуск флага СССР. 26 декабря 1991" },
-            { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Tractor_stalin.jpg/1024px-Tractor_stalin.jpg", caption: "Коллективизация. Трактора 1930-х" },
-            { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/1941_Soviet_poster.jpg/1024px-1941_Soviet_poster.jpg", caption: "«Родина-мать зовёт!» (вариант)" }
-        ];
+const allQuizzes = [
+    { q: "Когда был официально образован СССР?", a: ["1922", "1917", "1945", "1957"], correct: 0 },
+    { q: "Что такое ГОЭЛРО?", a: ["План электрификации страны", "Первый спутник", "Атомная бомба", "Зенитный ракетный комплекс"], correct: 0 },
+    { q: "Кто первым полетел в космос?", a: ["Юрий Гагарин", "Алексей Леонов", "Валентина Терешкова", "Герман Титов"], correct: 0 },
+    { q: "Какой город выдержал 872-дневную блокаду?", a: ["Ленинград", "Москва", "Сталинград", "Киев"], correct: 0 },
+    { q: "Когда произошла Сталинградская битва?", a: ["1942–1943", "1941", "1945", "1939"], correct: 0 },
+    { q: "Что символизировал запуск «Спутника-1»?", a: ["Начало космической эры", "Победу в войне", "Коллективизацию", "Перестройку"], correct: 0 },
+    { q: "Кто произнёс речь «О культе личности» в 1956 году?", a: ["Хрущёв", "Сталин", "Ленин", "Горбачёв"], correct: 0 },
+    { q: "Где состоялась стыковка «Союз–Аполлон»?", a: ["В космосе", "На Луне", "В Москве", "В Вашингтоне"], correct: 0 },
+    { q: "Что такое «Целина»?", a: ["Освоение степей Казахстана", "Строительство БАМа", "Ядерная программа", "Олимпиада-80"], correct: 0 },
+    { q: "Когда завершилась Великая Отечественная война?", a: ["9 мая 1945", "2 сентября 1945", "8 мая 1945", "7 ноября 1944"], correct: 0 },
+    { q: "Какой самолёт стал первым реактивным пассажирским в СССР?", a: ["Ту-104", "Ил-62", "Ан-2", "Ту-134"], correct: 0 },
+    { q: "Когда произошла авария на Чернобыльской АЭС?", a: ["26 апреля 1986", "26 апреля 1987", "12 апреля 1961", "4 октября 1957"], correct: 0 },
+    { q: "Кто был Генеральным секретарём в 1985–1991?", a: ["Михаил Горбачёв", "Леонид Брежнев", "Никита Хрущёв", "Иосиф Сталин"], correct: 0 },
+    { q: "Сколько республик входило в СССР на момент распада?", a: ["15", "4", "11", "9"], correct: 0 },
+    { q: "В каком году запущен первый искусственный спутник Земли?", a: ["1957", "1961", "1945", "1975"], correct: 0 },
+    { q: "Кто первым вышел в открытый космос?", a: ["Алексей Леонов", "Юрий Гагарин", "Валентина Терешкова", "Герман Титов"], correct: 0 },
+    { q: "В каком году СССР испытал первую атомную бомбу?", a: ["1949", "1953", "1961", "1975"], correct: 0 },
+    { q: "Когда началась Хрущёвская оттепель?", a: ["1956", "1961", "1945", "1985"], correct: 0 },
+    { q: "Что такое БАМ?", a: ["Байкало-Амурская магистраль", "Балтийско-Амурский мост", "Большая Атомная Магистраль", "Брест-Амурский маршрут"], correct: 0 },
+    { q: "Сколько дней длилась блокада Ленинграда?", a: ["872", "1418", "900", "1200"], correct: 0 },
+    { q: "Кто была первой женщиной-космонавтом?", a: ["Валентина Терешкова", "Светлана Савицкая", "Анна Фишер", "Елена Кондакова"], correct: 0 },
+    { q: "Когда прошла стыковка «Союз–Аполлон»?", a: ["1975", "1969", "1980", "1991"], correct: 0 },
+    { q: "Где запущена первая в мире АЭС (1954)?", a: ["Обнинск", "Москва", "Ленинград", "Киев"], correct: 0 },
+    { q: "Когда произошёл Карибский кризис?", a: ["1962", "1956", "1979", "1986"], correct: 0 },
+    { q: "Что такое СЭВ?", a: ["Совет Экономической Взаимопомощи", "Союз Электрических Войск", "Спутниковая Европейская Видеосвязь", "Союз Экологических Войн"], correct: 0 },
+    { q: "Что такое «Гласность»?", a: ["Политика открытости Горбачёва", "Ядерная программа", "Название спутника", "Боевой устав армии"], correct: 0 },
+    { q: "Кто создал автомат АК-47?", a: ["Михаил Калашников", "Сергей Королёв", "Фёдор Токарев", "Василий Дегтярёв"], correct: 0 },
+    { q: "В каком году распался СССР?", a: ["1991", "1989", "1993", "1985"], correct: 0 },
+    { q: "Как называлась первая советская орбитальная станция?", a: ["Салют-1", "Мир", "Восток", "Союз"], correct: 0 },
+    { q: "Какой танк считается лучшим танком Второй мировой войны?", a: ["Т-34", "ИС-2", "КВ-1", "Т-72"], correct: 0 },
+    { q: "Кто был главным конструктором советской ракетной программы?", a: ["Сергей Королёв", "Михаил Янгель", "Андрей Туполев", "Игорь Курчатов"], correct: 0 },
+    { q: "В каком году началась Великая Отечественная война?", a: ["1941", "1939", "1942", "1940"], correct: 0 },
+    { q: "Что такое «Перестройка»?", a: ["Реформы Горбачёва 1985–1991", "Послевоенное восстановление", "Строительство метро", "Космическая программа"], correct: 0 },
+    { q: "Где находится космодром Байконур?", a: ["Казахстан", "Россия", "Украина", "Узбекистан"], correct: 0 },
+    { q: "В каком году «Луна-9» впервые мягко села на Луну?", a: ["1966", "1969", "1970", "1972"], correct: 0 },
+    { q: "Кто написал «Мастера и Маргариту»?", a: ["Михаил Булгаков", "Борис Пастернак", "Александр Солженицын", "Михаил Шолохов"], correct: 0 },
+    { q: "Какой советский фильм получил премию «Оскар»?", a: ["«Война и мир» Бондарчука", "«Броненосец Потёмкин»", "«Иваново детство»", "«Зеркало»"], correct: 0 },
+    { q: "Когда советские войска вошли в Афганистан?", a: ["1979", "1975", "1985", "1968"], correct: 0 },
+    { q: "Как называлась советская система спутниковой навигации?", a: ["ГЛОНАСС", "GPS", "Молния", "Космос"], correct: 0 },
+    { q: "Кто создал водородную бомбу в СССР?", a: ["Андрей Сахаров", "Игорь Курчатов", "Анатолий Александров", "Юлий Харитон"], correct: 0 },
+    { q: "В каком году запущен «Буран»?", a: ["1988", "1985", "1991", "1983"], correct: 0 },
+    { q: "Что означает «НЭП»?", a: ["Новая Экономическая Политика", "Научно-Экспериментальная Программа", "Народная Электрификационная Программа", "Национальная Энергетическая Политика"], correct: 0 },
+    { q: "Кто был первым Президентом СССР (1990)?", a: ["Михаил Горбачёв", "Борис Ельцин", "Николай Рыжков", "Егор Лигачёв"], correct: 0 },
+    { q: "В каком году принята «Сталинская» Конституция?", a: ["1936", "1924", "1956", "1977"], correct: 0 },
+    { q: "Когда снята блокада Ленинграда?", a: ["27 января 1944", "9 мая 1945", "22 июня 1941", "8 сентября 1941"], correct: 0 },
+    { q: "Где прошла Тегеранская конференция (1943)?", a: ["Тегеран", "Ялта", "Потсдам", "Москва"], correct: 0 },
+    { q: "Кто автор плаката «Родина-мать зовёт!»?", a: ["Ираклий Тоидзе", "Дмитрий Моор", "Виктор Корецкий", "Алексей Кокорекин"], correct: 0 },
+    { q: "В каком году открылось московское метро?", a: ["1935", "1925", "1945", "1931"], correct: 0 },
+    { q: "Чем завершился Карибский кризис?", a: ["Дипломатическим соглашением", "Ядерной войной", "Вторжением на Кубу", "Распадом СССР"], correct: 0 },
+    { q: "Как звали советского барда, голос поколения, умершего в 1980 году?", a: ["Владимир Высоцкий", "Булат Окуджава", "Александр Галич", "Юрий Визбор"], correct: 0 },
+    { q: "Когда советские войска вошли в Чехословакию?", a: ["1968", "1956", "1979", "1980"], correct: 0 },
+    { q: "В каком году образован Варшавский договор?", a: ["1955", "1945", "1949", "1961"], correct: 0 },
+    { q: "Когда умер Иосиф Сталин?", a: ["5 марта 1953", "21 января 1924", "9 мая 1945", "7 ноября 1932"], correct: 0 },
+    { q: "Кем был Алексей Стаханов?", a: ["Шахтёром-рекордсменом", "Космонавтом", "Маршалом", "Конструктором самолётов"], correct: 0 },
+    { q: "Как называлось советское подпольное распространение запрещённой литературы?", a: ["Самиздат", "Тамиздат", "Спецхран", "Архив"], correct: 0 },
+    { q: "В каком году Горбачёв получил Нобелевскую премию мира?", a: ["1991", "1989", "1985", "1993"], correct: 0 },
+    { q: "Когда завершился вывод советских войск из Афганистана?", a: ["15 февраля 1989", "25 декабря 1991", "19 августа 1991", "8 декабря 1991"], correct: 0 },
+    { q: "Какой советский мультсериал стал самым популярным?", a: ["Ну, погоди!", "Простоквашино", "Чебурашка", "Винни-Пух"], correct: 0 },
+    { q: "Сколько лет занимал СССР по площади суши?", a: ["1/6 часть суши Земли", "1/4 часть суши Земли", "1/3 часть суши Земли", "1/10 часть суши Земли"], correct: 0 },
+    { q: "Когда был спущен последний советский флаг над Кремлём?", a: ["25 декабря 1991", "8 декабря 1991", "19 августа 1991", "26 декабря 1991"], correct: 0 },
+    { q: "Кто провёл первую дрейфующую полярную экспедицию «СП-1» (1937–1938)?", a: ["Иван Папанин", "Валерий Чкалов", "Юрий Гагарин", "Игорь Курчатов"], correct: 0 }
+];
 
-        // ==================== ПЕРЕМЕННЫЕ ====================
-        let currentLevel = 0;
-        let playerPower = 15;
-        let score = 0;
-        let knowledge = 50;
-        let enemyCurrentHp = 0;
-        let maxHp = 0;
-        let autoAttackInterval = null;
-        let autoAttackCost = 10;
-        let usedQuizzes = new Set();
-        let currentQuizIndex = 0;
-        let levelQuizzes = [];
-        let quizTimer = null;
-        let isTimedQuiz = false;
-        let timedQuizzes = [];
+const posters = [
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flag_of_the_Soviet_Union.svg/800px-Flag_of_the_Soviet_Union.svg.png", caption: "Флаг СССР. 1922–1991", year: "1922–1991" },
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Sputnik_1.jpg/800px-Sputnik_1.jpg", caption: "Первый искусственный спутник Земли. 4 октября 1957", year: "1957" },
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Yuri_Gagarin_1961.jpg/800px-Yuri_Gagarin_1961.jpg", caption: "Юрий Гагарин — первый человек в космосе. 12 апреля 1961", year: "1961" },
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Raising_a_Flag_over_the_Reichstag.jpg/800px-Raising_a_Flag_over_the_Reichstag.jpg", caption: "Знамя Победы над Рейхстагом. 1 мая 1945", year: "1945" },
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Vladimir_Lenin.jpg/800px-Vladimir_Lenin.jpg", caption: "Владимир Ленин — основатель СССР", year: "1922" },
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Khrushchev_1961.jpg/800px-Khrushchev_1961.jpg", caption: "Никита Хрущёв. Период оттепели и космических побед", year: "1956–1964" },
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Leonid_Brezhnev_official_photo.jpg/800px-Leonid_Brezhnev_official_photo.jpg", caption: "Леонид Брежнев. Эпоха застоя и разрядки", year: "1964–1982" },
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Mikhail_Gorbachev_1987.jpg/800px-Mikhail_Gorbachev_1987.jpg", caption: "Михаил Горбачёв. Перестройка и гласность", year: "1985–1991" },
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Apollo_Soyuz.jpg/800px-Apollo_Soyuz.jpg", caption: "Программа «Союз–Аполлон». Символ разрядки. 1975", year: "1975" },
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Gorbachev_and_Reagan_at_Geneva_Summit_1985.jpg/800px-Gorbachev_and_Reagan_at_Geneva_Summit_1985.jpg", caption: "Горбачёв и Рейган. Женевский саммит. 1985", year: "1985" },
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/RIAN_archive_612748_Signing_the_Agreement_on_the_Creation_of_the_CIS.jpg/800px-RIAN_archive_612748_Signing_the_Agreement_on_the_Creation_of_the_CIS.jpg", caption: "Беловежское соглашение. 8 декабря 1991 — конец СССР", year: "1991" },
+    { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Bundesarchiv_Bild_183-R77767%2C_Moskau%2C_Stalin_und_Molotow.jpg/800px-Bundesarchiv_Bild_183-R77767%2C_Moskau%2C_Stalin_und_Molotow.jpg", caption: "Сталин и Молотов. Эпоха индустриализации. 1930-е", year: "1930-е" }
+];
 
-        // ==================== ЗАПУСК ====================
-        const startBtn = document.getElementById('start-btn');
-        const introVideo = document.getElementById('intro-video');
+const levels = [
+    { year: 1922, enemy: "РАЗРУХА", hp: 80, text: "Гражданская война окончена. Восстанови страну!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flag_of_the_Soviet_Union.svg/800px-Flag_of_the_Soviet_Union.svg.png", caption: "30 декабря 1922. Декларация об образовании СССР." },
+    { year: 1930, enemy: "ГОЛОД И КОЛЛЕКТИВИЗАЦИЯ", hp: 120, text: "Колхозы или смерть? Выбирай путь индустриализации!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Bundesarchiv_Bild_183-R77767%2C_Moskau%2C_Stalin_und_Molotow.jpg/800px-Bundesarchiv_Bild_183-R77767%2C_Moskau%2C_Stalin_und_Molotow.jpg", caption: "Сталинская индустриализация. Эпоха пятилеток." },
+    { year: 1941, enemy: "ФАШИСТСКАЯ ИНТЕРВЕНЦИЯ", hp: 250, text: "22 июня. Враг у ворот! Защити Родину!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Raising_a_Flag_over_the_Reichstag.jpg/800px-Raising_a_Flag_over_the_Reichstag.jpg", caption: "Великая Отечественная война 1941–1945." },
+    { year: 1945, enemy: "ПОСЛЕДНИЙ БОЙ", hp: 180, text: "Берлин. Знамя Победы над Рейхстагом!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Raising_a_Flag_over_the_Reichstag.jpg/800px-Raising_a_Flag_over_the_Reichstag.jpg", caption: "9 мая 1945. Знамя Победы над Рейхстагом." },
+    { year: 1955, enemy: "ЗАСТОЙ В ИДЕЯХ", hp: 140, text: "Оттепель! Разморозь культуру и науку!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Sputnik_1.jpg/800px-Sputnik_1.jpg", caption: "Первый искусственный спутник Земли, 1957." },
+    { year: 1961, enemy: "КОСМИЧЕСКАЯ ГОНКА", hp: 200, text: "Гагарин в космосе! Покажи капиталистам!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Yuri_Gagarin_1961.jpg/800px-Yuri_Gagarin_1961.jpg", caption: "12 апреля 1961. Юрий Гагарин — первый человек в космосе." },
+    { year: 1970, enemy: "ХОЛОДНАЯ ВОЙНА", hp: 220, text: "Соревнование систем. Укрепи идеологию!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Apollo_Soyuz.jpg/800px-Apollo_Soyuz.jpg", caption: "Программа «Союз–Аполлон» — 1975." },
+    { year: 1985, enemy: "ПЕРЕСТРОЙКА", hp: 190, text: "Гласность и ускорение. Новый курс!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Mikhail_Gorbachev_1987.jpg/800px-Mikhail_Gorbachev_1987.jpg", caption: "Горбачёв. Перестройка и гласность. 1985–1991." },
+    { year: 1991, enemy: "РАСПАД СССР", hp: 300, text: "Последний бой за Союз. Беловежское соглашение!", photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flag_of_the_Soviet_Union.svg/800px-Flag_of_the_Soviet_Union.svg.png", caption: "26 декабря 1991. Флаг СССР спущен навсегда." }
+];
 
-        startBtn.onclick = () => {
-            document.getElementById('screen-intro').classList.add('hidden');
-            document.getElementById('screen-video').classList.remove('hidden');
-            introVideo.play().catch(() => {});
-        };
+// ===== ПЕРЕМЕННЫЕ =====
+let currentLevel = 0, playerPower = 15, score = 0, knowledge = 50;
+let enemyCurrentHp = 0, maxHp = 0;
+let autoAttackInterval = null, autoAttackCost = 10;
+let usedQuizzes = new Set(), currentQuizIndex = 0, levelQuizzes = [];
+let isTimedQuiz = false, timedQuizzes = [], quizTimer = null;
 
-        introVideo.onended = () => {
-            document.getElementById('screen-video').classList.add('hidden');
-            document.getElementById('screen-loading').classList.remove('hidden');
-            startLoading();
-        };
-
-        function startLoading() {
-            let progress = 0;
-            const fill = document.getElementById('load-fill');
-            const factText = document.getElementById('fact-text');
-            const interval = setInterval(() => {
-                progress += Math.random() * 5 + 2;
-                if (progress > 100) progress = 100;
-                fill.style.width = progress + "%";
-                if (Math.random() > 0.7) factText.innerText = facts[Math.floor(Math.random() * facts.length)];
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        document.getElementById('screen-loading').classList.add('hidden');
-                        document.getElementById('screen-game').classList.remove('hidden');
-                        initLevel();
-                        renderFactsTab();
-                        renderPostersTab();
-                        startQuizTimer();
-                    }, 600);
-                }
-            }, 35);
+// ===== ЗАПУСК =====
+document.getElementById('start-btn').onclick = () => {
+    document.getElementById('screen-intro').classList.add('hidden');
+    document.getElementById('screen-video').classList.remove('hidden');
+    document.getElementById('intro-video').play().catch(() => skipVideo());
+};
+document.getElementById('intro-video').onended = () => skipVideo();
+function skipVideo() {
+    document.getElementById('screen-video').classList.add('hidden');
+    document.getElementById('screen-loading').classList.remove('hidden');
+    startLoading();
+}
+function startLoading() {
+    let progress = 0;
+    const fill = document.getElementById('load-fill');
+    const factText = document.getElementById('fact-text');
+    const iv = setInterval(() => {
+        progress += Math.random() * 5 + 2;
+        if (progress > 100) progress = 100;
+        fill.style.width = progress + "%";
+        if (Math.random() > 0.6) factText.innerText = facts[Math.floor(Math.random() * facts.length)];
+        if (progress >= 100) {
+            clearInterval(iv);
+            setTimeout(() => {
+                document.getElementById('screen-loading').classList.add('hidden');
+                document.getElementById('screen-game').classList.remove('hidden');
+                initLevel(); renderFactsTab(); renderPostersTab(); startQuizTimer();
+            }, 600);
         }
+    }, 35);
+}
 
-        // ==================== ТАБЫ ====================
-        function switchTab(n) {
-            document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === n));
-            document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i === n));
-        }
+// ===== ТАБЫ =====
+function switchTab(n) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === n));
+    document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i === n));
+}
 
-        // ==================== ТАБ 1: ФАКТЫ ====================
-        function renderFactsTab() {
-            const container = document.getElementById('facts-list');
-            container.innerHTML = `<h2 style="margin-bottom:25px;color:var(--gold);">120 ИНТЕРЕСНЫХ ФАКТОВ ОБ СССР</h2>`;
-            facts.forEach(f => {
-                const div = document.createElement('div');
-                div.className = 'fact-item';
-                div.innerHTML = `📌 ${f}`;
-                container.appendChild(div);
-            });
-        }
+// ===== ФАКТЫ =====
+function renderFactsTab() {
+    const c = document.getElementById('facts-list');
+    c.innerHTML = `<h2 style="margin-bottom:25px;color:var(--gold);">200 ИНТЕРЕСНЫХ ФАКТОВ ОБ СССР</h2>`;
+    facts.forEach((f, i) => {
+        const d = document.createElement('div');
+        d.className = 'fact-item';
+        d.innerHTML = `<span style="color:var(--gold);margin-right:8px;">${i+1}.</span> ${f}`;
+        c.appendChild(d);
+    });
+}
 
-        // ==================== ТАБ 2: ПЛАКАТЫ ====================
-        function renderPostersTab() {
-            const grid = document.getElementById('posters-grid');
-            grid.innerHTML = `<h2 style="margin-bottom:25px;color:var(--gold);width:100%;">МОМЕНТЫ ИСТОРИИ — СОВЕТСКИЕ ПЛАКАТЫ</h2>`;
-            posters.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'poster-card';
-                card.innerHTML = `
-                    <img src="${p.url}" alt="Плакат" 
-                         onerror="this.onerror=null;this.src='${DEFAULT_IMAGE}';">
-                    <div class="poster-caption">${p.caption}</div>
-                `;
-                grid.appendChild(card);
-            });
-        }
+// ===== ПЛАКАТЫ (ИСПРАВЛЕНО) =====
+function renderPostersTab() {
+    const grid = document.getElementById('posters-grid');
+    grid.innerHTML = `<h2 style="margin-bottom:25px;color:var(--gold);width:100%;">МОМЕНТЫ ИСТОРИИ СССР</h2>`;
+    posters.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'poster-card';
+        const wrap = document.createElement('div');
+        wrap.className = 'poster-img-wrap';
+        const img = document.createElement('img');
+        img.alt = p.caption;
+        img.loading = 'lazy';
+        const ph = document.createElement('div');
+        ph.className = 'poster-placeholder';
+        ph.innerHTML = `<div class="star">☭</div><div class="ph-year">${p.year}</div>`;
+        img.onload = () => wrap.classList.remove('error');
+        img.onerror = () => wrap.classList.add('error');
+        img.src = p.url;
+        wrap.appendChild(img);
+        wrap.appendChild(ph);
+        const caption = document.createElement('div');
+        caption.className = 'poster-caption';
+        caption.textContent = p.caption;
+        card.appendChild(wrap);
+        card.appendChild(caption);
+        grid.appendChild(card);
+    });
+}
 
-        // ==================== БИТВА ====================
-        function initLevel() {
-            const lvl = levels[currentLevel];
-            enemyCurrentHp = lvl.hp;
-            maxHp = lvl.hp;
-            document.getElementById('year-tag').innerText = lvl.year;
-            document.getElementById('enemy-name').innerText = lvl.enemy;
-            document.getElementById('enemy-text').innerText = lvl.text;
-            updateUI();
-        }
+// ===== БИТВА =====
+function initLevel() {
+    const lvl = levels[currentLevel];
+    enemyCurrentHp = lvl.hp; maxHp = lvl.hp;
+    document.getElementById('year-tag').innerText = lvl.year;
+    document.getElementById('enemy-name').innerText = lvl.enemy;
+    document.getElementById('enemy-text').innerText = lvl.text;
+    updateUI();
+}
+function attack() {
+    const dmg = Math.floor(playerPower + Math.random() * 8);
+    enemyCurrentHp -= dmg; score += Math.floor(dmg / 2); knowledge = Math.min(100, knowledge + 2);
+    const hpEl = document.getElementById('enemy-hp');
+    hpEl.classList.add('hit');
+    setTimeout(() => hpEl.classList.remove('hit'), 300);
+    if (enemyCurrentHp <= 0) { enemyCurrentHp = 0; updateUI(); winLevel(); } else updateUI();
+}
+function updateUI() {
+    document.getElementById('power').innerText = playerPower;
+    document.getElementById('score').innerText = score;
+    document.getElementById('knowledge').innerText = knowledge;
+    document.getElementById('enemy-hp').style.width = Math.max(0, (enemyCurrentHp / maxHp) * 100) + "%";
+}
+function winLevel() {
+    score += 300 + currentLevel * 80; knowledge = Math.min(100, knowledge + 25); updateUI();
+    const available = allQuizzes.filter((_, i) => !usedQuizzes.has(i));
+    levelQuizzes = [...available].sort(() => 0.5 - Math.random()).slice(0, 3);
+    currentQuizIndex = 0; isTimedQuiz = false;
+    if (levelQuizzes.length > 0) showQuiz(); else nextLevel();
+}
+function showQuiz() {
+    document.getElementById('quiz-modal').style.display = 'flex';
+    document.getElementById('quiz-title').innerText = isTimedQuiz ? 'СРОЧНАЯ ВИКТОРИНА КГБ' : `ВИКТОРИНА ${levels[currentLevel]?.year || ''} ГОДА`;
+    document.getElementById('quiz-result').innerHTML = '';
+    document.getElementById('quiz-next-btn').style.display = 'none';
+    const arr = isTimedQuiz ? timedQuizzes : levelQuizzes;
+    const q = arr[currentQuizIndex];
+    document.getElementById('quiz-question').innerText = q.q;
+    const od = document.getElementById('quiz-options');
+    od.innerHTML = '';
+    q.a.forEach((ans, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'quiz-option';
+        btn.innerText = ans;
+        btn.onclick = () => checkAnswer(i, q.correct, btn, q);
+        od.appendChild(btn);
+    });
+}
+function checkAnswer(sel, correct, el, q) {
+    document.querySelectorAll('.quiz-option').forEach((opt, i) => {
+        opt.style.pointerEvents = 'none';
+        if (i === correct) opt.classList.add('correct');
+        else if (i === sel) opt.classList.add('wrong');
+    });
+    const idx = allQuizzes.indexOf(q);
+    if (idx >= 0) usedQuizzes.add(idx);
+    if (sel === correct) {
+        knowledge = Math.min(100, knowledge + 12); score += 40; playerPower += 9;
+        document.getElementById('quiz-result').innerHTML = `<span style="color:#0f0">✅ ВЕРНО! +40 ОЧКОВ +9 СИЛЫ +12 ЗНАНИЯ</span>`;
+    } else {
+        document.getElementById('quiz-result').innerHTML = `<span style="color:#f00">❌ НЕВЕРНО. Правильный: <b>${q.a[correct]}</b></span>`;
+    }
+    updateUI();
+    document.getElementById('quiz-next-btn').style.display = 'block';
+}
+function nextQuestionOrClose() {
+    currentQuizIndex++;
+    const arr = isTimedQuiz ? timedQuizzes : levelQuizzes;
+    if (currentQuizIndex < arr.length) { showQuiz(); return; }
+    document.getElementById('quiz-modal').style.display = 'none';
+    if (isTimedQuiz) { knowledge = Math.min(100, knowledge + 50); updateUI(); showToast('🎉 СРОЧНАЯ ВИКТОРИНА ЗАВЕРШЕНА! +50 ЗНАНИЯ'); }
+    else nextLevel();
+}
+function nextLevel() {
+    currentLevel++;
+    if (currentLevel < levels.length) { initLevel(); }
+    else {
+        document.getElementById('screen-game').classList.add('hidden');
+        document.getElementById('screen-victory').classList.remove('hidden');
+        document.getElementById('final-power').innerText = playerPower + ' 🔥';
+        document.getElementById('final-knowledge').innerText = knowledge + '% 📖';
+    }
+}
+function upgrade(amount, name) {
+    playerPower += amount; knowledge = Math.min(100, knowledge + 5); score += 20;
+    updateUI(); showToast(`✅ ${name} УЛУЧШЕНА!`);
+}
+function buyAutoAttack() {
+    if (score >= autoAttackCost) {
+        score -= autoAttackCost; autoAttackCost = Math.floor(autoAttackCost * 1.7); updateUI();
+        if (!autoAttackInterval) autoAttackInterval = setInterval(() => { if (enemyCurrentHp > 0) attack(); }, 900);
+        showToast('🚀 АВТО-РЕФОРМА ЗАПУЩЕНА!');
+    } else showToast('❗ Недостаточно очков!');
+}
 
-        function attack() {
-            const damage = Math.floor(playerPower + Math.random() * 8);
-            enemyCurrentHp -= damage;
-            score += Math.floor(damage / 2);
-            knowledge = Math.min(100, knowledge + 2);
+// ===== АРХИВ (ИСПРАВЛЕНО) =====
+function toggleArchive() {
+    const panel = document.getElementById('archive-panel');
+    if (panel.classList.contains('show')) { panel.classList.remove('show'); return; }
+    const lvl = levels[currentLevel];
+    const wrap = document.getElementById('archive-img-wrap');
+    const img = document.getElementById('archive-img');
+    document.getElementById('archive-year-badge').innerText = lvl.year;
+    document.getElementById('archive-ph-year').innerText = lvl.year;
+    wrap.classList.remove('error');
+    img.onload = () => wrap.classList.remove('error');
+    img.onerror = () => wrap.classList.add('error');
+    img.src = '';
+    setTimeout(() => { img.src = lvl.photo; }, 50);
+    document.getElementById('archive-caption').innerHTML = `<strong>${lvl.year}:</strong> ${lvl.caption}`;
+    panel.classList.add('show');
+}
 
-            const hpBar = document.getElementById('enemy-hp');
-            hpBar.classList.add('hit');
-            setTimeout(() => hpBar.classList.remove('hit'), 400);
+// ===== АВТО-ВИКТОРИНА =====
+function startQuizTimer() {
+    if (quizTimer) clearInterval(quizTimer);
+    quizTimer = setInterval(() => {
+        if (document.getElementById('screen-game').classList.contains('hidden')) return;
+        const available = allQuizzes.filter((_, i) => !usedQuizzes.has(i));
+        if (available.length < 5) { usedQuizzes.clear(); return; }
+        timedQuizzes = [...available].sort(() => 0.5 - Math.random()).slice(0, 5);
+        currentQuizIndex = 0; isTimedQuiz = true;
+        document.getElementById('quiz-modal').style.display = 'flex';
+        showQuiz();
+    }, 300000);
+}
 
-            if (enemyCurrentHp <= 0) {
-                enemyCurrentHp = 0;
-                updateUI();
-                winLevel();
-            } else {
-                updateUI();
-            }
-        }
+// ===== УТИЛИТЫ =====
+function showToast(msg) {
+    const t = document.createElement('div');
+    t.className = 'toast'; t.innerText = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2700);
+}
 
-        function updateUI() {
-            document.getElementById('power').innerText = playerPower;
-            document.getElementById('score').innerText = score;
-            document.getElementById('knowledge').innerText = knowledge;
-            const hpPercent = Math.max(0, (enemyCurrentHp / maxHp) * 100);
-            document.getElementById('enemy-hp').style.width = hpPercent + "%";
-        }
+// Удержание кнопки
+const attackBtn = document.querySelector('#hero-action button');
+let holdTimer;
+attackBtn.addEventListener('mousedown', () => { holdTimer = setInterval(() => { if (enemyCurrentHp > 0) attack(); }, 110); });
+attackBtn.addEventListener('mouseup', () => clearInterval(holdTimer));
+attackBtn.addEventListener('mouseleave', () => clearInterval(holdTimer));
+attackBtn.addEventListener('touchstart', e => { e.preventDefault(); holdTimer = setInterval(() => { if (enemyCurrentHp > 0) attack(); }, 110); });
+attackBtn.addEventListener('touchend', () => clearInterval(holdTimer));
 
-        function winLevel() {
-            score += 300 + currentLevel * 80;
-            knowledge = Math.min(100, knowledge + 25);
-            updateUI();
-
-            levelQuizzes = [];
-            const available = allQuizzes.filter((_, i) => !usedQuizzes.has(i));
-            const shuffled = [...available].sort(() => 0.5 - Math.random());
-            levelQuizzes = shuffled.slice(0, 3);
-            currentQuizIndex = 0;
-            isTimedQuiz = false;
-            if (levelQuizzes.length > 0) showQuiz();
-            else nextLevel();
-        }
-
-        function showQuiz() {
-            const modal = document.getElementById('quiz-modal');
-            modal.style.display = 'flex';
-            document.getElementById('quiz-title').innerText = isTimedQuiz ? `СРОЧНАЯ ВИКТОРИНА (5 ВОПРОСОВ)` : `ВИКТОРИНА ${levels[currentLevel].year} ГОДА`;
-            document.getElementById('quiz-result').innerHTML = '';
-            document.getElementById('quiz-next-btn').style.display = 'none';
-
-            const q = (isTimedQuiz ? timedQuizzes : levelQuizzes)[currentQuizIndex];
-            document.getElementById('quiz-question').innerText = q.q;
-            const optionsDiv = document.getElementById('quiz-options');
-            optionsDiv.innerHTML = '';
-            q.a.forEach((answer, i) => {
-                const btn = document.createElement('div');
-                btn.className = 'quiz-option';
-                btn.innerText = answer;
-                btn.onclick = () => checkAnswer(i, q.correct, btn, q);
-                optionsDiv.appendChild(btn);
-            });
-        }
-
-        function checkAnswer(selected, correct, element, q) {
-            const allOptions = document.querySelectorAll('.quiz-option');
-            allOptions.forEach((opt, i) => {
-                opt.style.pointerEvents = 'none';
-                if (i === correct) opt.classList.add('correct');
-                else if (i === selected) opt.classList.add('wrong');
-            });
-
-            const idx = allQuizzes.indexOf(q);
-            if (idx >= 0) usedQuizzes.add(idx);
-
-            if (selected === correct) {
-                knowledge = Math.min(100, knowledge + 12);
-                score += 40;
-                playerPower += 9;
-                document.getElementById('quiz-result').innerHTML = `<span style="color:#0f0">✅ ВЕРНО! +40 ОЧКОВ +9 СИЛЫ +12 ЗНАНИЯ</span>`;
-            } else {
-                document.getElementById('quiz-result').innerHTML = `<span style="color:#f00">❌ НЕВЕРНО. Правильный: ${q.a[correct]}</span>`;
-            }
-            updateUI();
-            document.getElementById('quiz-next-btn').style.display = 'block';
-        }
-
-        function nextQuestionOrClose() {
-            currentQuizIndex++;
-            const modal = document.getElementById('quiz-modal');
-            const currentArray = isTimedQuiz ? timedQuizzes : levelQuizzes;
-
-            if (currentQuizIndex < currentArray.length) {
-                showQuiz();
-            } else {
-                modal.style.display = 'none';
-                if (isTimedQuiz) {
-                    alert('🎉 СРОЧНАЯ ВИКТОРИНА ЗАВЕРШЕНА! +50 ЗНАНИЯ');
-                    knowledge = Math.min(100, knowledge + 50);
-                    updateUI();
-                } else {
-                    nextLevel();
-                }
-            }
-        }
-
-        function nextLevel() {
-            currentLevel++;
-            if (currentLevel < levels.length) {
-                initLevel();
-            } else {
-                document.getElementById('screen-game').classList.add('hidden');
-                const victory = document.getElementById('screen-victory');
-                victory.classList.remove('hidden');
-                document.getElementById('final-power').innerText = playerPower + ' 🔥';
-                document.getElementById('final-knowledge').innerText = knowledge + '% 📖';
-            }
-        }
-
-        function upgrade(amount, name) {
-            playerPower += amount;
-            knowledge = Math.min(100, knowledge + 5);
-            score += 20;
-            updateUI();
-            const msg = document.createElement('div');
-            msg.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#ffd700;color:#111;padding:15px 30px;border-radius:0;font-size:1.3rem;';
-            msg.innerText = `✅ ${name} УЛУЧШЕНА!`;
-            document.body.appendChild(msg);
-            setTimeout(() => msg.remove(), 2200);
-        }
-
-        function buyAutoAttack() {
-            if (score >= autoAttackCost) {
-                score -= autoAttackCost;
-                autoAttackCost = Math.floor(autoAttackCost * 1.7);
-                updateUI();
-                if (!autoAttackInterval) {
-                    autoAttackInterval = setInterval(() => { if (enemyCurrentHp > 0) attack(); }, 900);
-                }
-                alert('🚀 АВТО-РЕФОРМА ЗАПУЩЕНА!');
-            } else alert('Недостаточно очков!');
-        }
-
-        // ==================== АВТО-ВИКТОРИНА КАЖДЫЕ 5 МИНУТ ПО 5 ВОПРОСОВ ====================
-        function startQuizTimer() {
-            if (quizTimer) clearInterval(quizTimer);
-            quizTimer = setInterval(() => {
-                if (document.getElementById('screen-game').classList.contains('hidden')) return;
-
-                const available = allQuizzes.filter((_, i) => !usedQuizzes.has(i));
-                if (available.length < 5) { usedQuizzes.clear(); return; }
-
-                timedQuizzes = available.sort(() => 0.5 - Math.random()).slice(0, 5);
-                currentQuizIndex = 0;
-                isTimedQuiz = true;
-
-                const modal = document.getElementById('quiz-modal');
-                modal.style.display = 'flex';
-                showQuiz();
-            }, 300000);
-        }
-
-        // ==================== АРХИВ ====================
-        function toggleArchive() {
-            const panel = document.getElementById('archive-panel');
-            const lvl = levels[currentLevel];
-            const img = document.getElementById('archive-img');
-            img.src = lvl.photo;
-            // Если вдруг не загрузится — сразу fallback
-            img.onerror = function() {
-                this.onerror = null;
-                this.src = GITHUB_FALLBACK;
-            };
-            document.getElementById('archive-caption').innerHTML = `<strong>${lvl.year}:</strong> ${lvl.caption}`;
-            panel.classList.toggle('show');
-        }
-
-        // ==================== УДЕРЖАНИЕ КНОПКИ ====================
-        const attackBtn = document.querySelector('#hero-action button');
-        let holdTimer;
-        attackBtn.addEventListener('mousedown', () => { holdTimer = setInterval(() => { if (enemyCurrentHp > 0) attack(); }, 110); });
-        attackBtn.addEventListener('mouseup', () => clearInterval(holdTimer));
-        attackBtn.addEventListener('mouseleave', () => clearInterval(holdTimer));
-
-        // Пасхалка
-        document.addEventListener('keydown', e => {
-            if (e.key.toLowerCase() === 'и') {
-                playerPower += 50;
-                knowledge = Math.min(100, knowledge + 10);
-                updateUI();
-                alert('🎉 ПАСХАЛКА! +50 СИЛЫ');
-            }
-        });
-
-        console.log('%c✅ ИГРА v3.3 ЗАГРУЖЕНА • ИЗОБРАЖЕНИЯ ВИДНЫ ПО ЛЮБАСУ (fallback на флаг + GitHub)', 'color:#ffd700;font-size:18px');
-    </script>
+// Пасхалка
+document.addEventListener('keydown', e => {
+    if (e.key.toLowerCase() === 'и') { playerPower += 50; knowledge = Math.min(100, knowledge + 10); updateUI(); showToast('🎉 ПАСХАЛКА! +50 СИЛЫ'); }
+});
+</script>
 </body>
 </html>
